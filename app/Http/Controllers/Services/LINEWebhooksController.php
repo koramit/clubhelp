@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Services;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
@@ -53,13 +54,29 @@ class LINEWebhooksController extends Controller
         Log::info($response->body());
 
         $profile = $response->json();
+        $user = User::where('profile->social->id', $event['source']['userId'])->first();
+
+        if (! $user) {
+            $url = url('/');
+            $this->replyMessage($event['replyToken'], [
+                [
+                    'type' => 'text',
+                    'text' => "ขออภัย {$profile['displayName']} 🙏\nยังไม่สามารถให้บริการท่านได้ \n\nโปรดลงทำการลงทะเบียนก่อนที่ {$url}\n\n😅",
+                ]
+            ]);
+            return;
+        }
 
         // reply
-        $messages = [];
-        $messages[] = [
-            'type' => 'text',
-            'text' => "สวัสดี {$profile['displayName']} 😃\nขอบคุณที่เป็นเพื่อนกับ Wordplease 🙏\n\nโปรดลงทะเบียนโดยการพิมพ์ verification code ส่งมาที่นี่เลย\n\n✌️",
-        ];
+        if ($channel = $user->getNotificationChannel() === null) {
+            $user->setNotificationChannel('line', $event['source']['userId']);
+            $messages = [
+                [
+                    'type' => 'text',
+                    'text' => "สวัสดี {$profile['displayName']} 😃\n\n Welcome to the Club!! ✌️",
+                ]
+            ];
+        }
         $this->replyMessage($event['replyToken'], $messages);
 
         // save or update profile

@@ -38,6 +38,7 @@ class RegisteredUserController extends Controller
             'name' => ['string', 'min:4', 'max:255', 'unique:users'],
             'email' => ['email'],
             'tel_no' => ['digits_between:9,10'],
+            'agreement_accepted' => ['required'],
             'org_id' => [
                 function ($attribute, $value, $fail) {
                     $userExist = User::where('profile->org_id', $value)->first();
@@ -67,7 +68,7 @@ class RegisteredUserController extends Controller
             'tel_no' => $data['tel_no'],
             'org_id' => $data['org_id'],
             'remark' => $data['remark'],
-            'notification_setup' => false,
+            'notification_channels' => [],
             'social' => $socialProfile,
         ];
         $user->next_activation_at = now()->addDays($data['password_expires_in_days'] ?? 0);
