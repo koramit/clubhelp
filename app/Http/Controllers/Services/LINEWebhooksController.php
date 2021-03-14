@@ -62,19 +62,20 @@ class LINEWebhooksController extends Controller
                 [
                     'type' => 'text',
                     'text' => "ขออภัย {$profile['displayName']} 🙏\nยังไม่สามารถให้บริการท่านได้ \n\nโปรดลงทำการลงทะเบียนก่อนที่ {$url}\n\n😅",
-                ]
+                ],
             ]);
+
             return;
         }
 
         // reply
-        if ($channel = $user->getNotificationChannel() === null) {
+        if ($user->getNotificationChannel() === null) {
             $user->setNotificationChannel('line', $event['source']['userId']);
             $messages = [
                 [
                     'type' => 'text',
-                    'text' => "สวัสดี {$profile['displayName']} 😃\n\n Welcome to the Club!! ✌️",
-                ]
+                    'text' => "สวัสดี {$user->profle['full_name']} 😃\n\n Welcome to the Club!! ✌️",
+                ],
             ];
         }
         $this->replyMessage($event['replyToken'], $messages);
