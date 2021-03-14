@@ -11,7 +11,7 @@
     <link href="{{ mix('/css/app.css') }}" rel="stylesheet" />
 </head>
 
-<body class="m-0 bg-soft-theme-light font-fascinate-inline">
+<body class="m-0 bg-white font-fascinate-inline">
     <div class="flex justify-center items-center w-full min-h-screen">
         <div
             class="flex flex-col justify-center items-center w-80 h-80 rounded-full bg-bitter-theme-light text-dark-theme-light text-8xl">
@@ -19,6 +19,12 @@
             <div class=" text-soft-theme-light mt-2">HELP</div>
         </div>
     </div>
+
+    <div class="w-72 h-24 bg-soft-theme-light">soft-theme-light</div>
+    <div class="w-72 h-24 bg-alt-theme-light">alt-theme-light</div>
+    <div class="w-72 h-24 bg-bitter-theme-light">bitter-theme-light</div>
+    <div class="w-72 h-24 bg-thick-theme-light">thick-theme-light</div>
+    <div class="w-72 h-24 bg-dark-theme-light">dark-theme-light</div>
 </body>
 
 </html>

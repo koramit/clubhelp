@@ -19,7 +19,7 @@ Route::get('/logo', function () {
 
 Route::get('/cases', function () {
     return \Inertia\Inertia::render('Encounters/Index');
-})->middleware(['auth'])->name('cases');
+})->name('cases');
 
 // login
 Route::middleware('guest')->get('/login', [AuthenticatedSessionController::class, 'index'])->name('login');
@@ -37,4 +37,4 @@ Route::middleware('auth')->get('/quarantine', QuarantinedUserController::class)-
 
 // webhooks
 Route::post('/webhooks/line', LINEWebhooksController::class);
-Route::post('/webhooks/telegram/{token}', TelegramWebhooksController::class );
+Route::post('/webhooks/telegram/{token}', TelegramWebhooksController::class);
