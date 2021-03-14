@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\ActivatedUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\QuarantinedUserController;
+use App\Http\Controllers\Service\LINEWebhooksController;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 
@@ -32,3 +33,6 @@ Route::middleware('guest')->post('/activate', ActivatedUserController::class);
 
 // quarantine user
 Route::middleware('auth')->get('/quarantine', QuarantinedUserController::class)->name('quarantine');
+
+// webhooks
+Route::post('/webhooks/line', LINEWebhooksController::class);
