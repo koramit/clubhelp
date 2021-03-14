@@ -1,0 +1,1 @@
+(self.webpackChunk=self.webpackChunk||[]).push([[161],{161:(e,c,r)=>{"use strict";r.r(c),r.d(c,{default:()=>u});var t=r(5166),n={class:" text-red-200"};const s={render:function(e,c){return(0,t.openBlock)(),(0,t.createBlock)("h1",n," CLUBHELP ")}},u=s}}]);
