@@ -44,6 +44,8 @@ return [
         'redirect'      => env('TELEGRAM_CLIENT_REDIRECT'),
         'bot_link_url'  => env('TELEGRAM_BOT_LINK_URL'),
         'bot_token'     => env('TELEGRAM_CLIENT_SECRET'),
+        'widget_src'     => env('TELEGRAM_WIDGET_SRC'),
+        'request_access'     => env('TELEGRAM_REQUEST_ACCESS', null),
     ],
 
 ];
