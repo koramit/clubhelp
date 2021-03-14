@@ -68,7 +68,7 @@ class RegisteredUserController extends Controller
             'tel_no' => $data['tel_no'],
             'org_id' => $data['org_id'],
             'remark' => $data['remark'],
-            'notification_setup' => false,
+            'notification_channels' => [],
             'social' => $socialProfile,
         ];
         $user->next_activation_at = now()->addDays($data['password_expires_in_days'] ?? 0);

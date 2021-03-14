@@ -43,7 +43,7 @@ class User extends Authenticatable
 
     public function needQuarantine()
     {
-        if (! $this->profile['notification_setup']) {
+        if ($this->getNotificationChannel()) {
             return 'notification';
         }
 
@@ -52,5 +52,24 @@ class User extends Authenticatable
         }
 
         return false;
+    }
+
+    public function getNotificationChannel()
+    {
+        if ($this->profile['notification_channels'] === []) {
+            return null;
+        }
+
+        return $this->profile['notification_channels'][$this->profile['notification_channels']['provider']];
+    }
+
+    public function setNotificationChannel($provider, $userId)
+    {
+        $notificationChannels = $this->profile['notification_channels'];
+        $notificationChannels['provider'] = $provider;
+        $notificationChannels[$provider]['id'] = $userId;
+        $notificationChannels[$provider]['active'] = true;
+        $this->profile['notification_channels'] = $notificationChannels;
+        $this->save();
     }
 }
