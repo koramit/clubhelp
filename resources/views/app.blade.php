@@ -8,14 +8,13 @@
     {{-- minutes to microseconds --}}
     <meta name="session-lifetime-seconds"
         content="{{ Config::get('session.lifetime') * 60000 }}" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Lobster&family=Sarabun:ital,wght@0,200;0,600;1,200;1,600&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Fascinate+Inline&family=Mali:wght@300;600&display=swap"
         rel="stylesheet">
     <link href="{{ mix('/css/app.css') }}" rel="stylesheet" />
     <script src="{{ mix('/js/app.js') }}" defer></script>
 </head>
 
-<body class="m-0 font-sarabun font-extralight text-gray-700 bg-soft-theme-light">
+<body class="m-0 font-mali font-light text-gray-700 bg-soft-theme-light">
     @inertia
         <div id="page-loading-indicator"
             style="height: 100vh; display: flex; align-items: center; justify-content: center;">

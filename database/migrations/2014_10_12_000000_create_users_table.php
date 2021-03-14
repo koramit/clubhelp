@@ -15,11 +15,43 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
+            $table->uuid('slug');
+            $table->string('name')->unique();
+            $table->string('email')->nullable()->index();
+            $table->string('password')->nullable();
+            $table->json('profile');
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->timestamp('next_activation_at')->nullable();
             $table->rememberToken();
+            $table->softDeletes();
+            $table->timestamps();
+        });
+
+        Schema::create('abilities', function (Blueprint $table) {
+            $table->smallIncrements('id');
+            $table->string('name')->unique();
+            $table->string('label')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('roles', function (Blueprint $table) {
+            $table->smallIncrements('id');
+            $table->string('name')->unique();
+            $table->string('label')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('ability_role', function (Blueprint $table) {
+            $table->primary(['role_id', 'ability_id']);
+            $table->unsignedSmallInteger('role_id')->constrained('roles')->onDelete('cascade');
+            $table->unsignedSmallInteger('ability_id')->constrained('abilities')->onDelete('cascade');
+            $table->timestamps();
+        });
+
+        Schema::create('role_user', function (Blueprint $table) {
+            $table->primary(['user_id', 'role_id']);
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->unsignedSmallInteger('role_id')->constrained('roles')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -31,6 +63,10 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('role_user');
+        Schema::dropIfExists('ability_role');
+        Schema::dropIfExists('roles');
+        Schema::dropIfExists('abilities');
         Schema::dropIfExists('users');
     }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -18,8 +17,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'email',
-        'password',
+        'login',
     ];
 
     /**
@@ -38,6 +36,21 @@ class User extends Authenticatable
      * @var array
      */
     protected $casts = [
+        'profile' => 'array',
         'email_verified_at' => 'datetime',
+        'next_activation_at' => 'datetime',
     ];
+
+    public function needQuarantine()
+    {
+        if (! $this->profile['notification_setup']) {
+            return 'notification';
+        }
+
+        if ($this->next_activation_at->isPast()) {
+            return 'activation';
+        }
+
+        return false;
+    }
 }
