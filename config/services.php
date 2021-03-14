@@ -30,4 +30,20 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'line' => [
+        'client_id'     => env('LINE_CLIENT_ID'),
+        'client_secret' => env('LINE_CLIENT_SECRET'),
+        'redirect'      => env('LINE_CLIENT_REDIRECT'),
+        'bot_link_url'     => env('LINE_BOT_LINK_URL'),
+        'bot_token'     => env('LINE_BOT_TOKEN'),
+    ],
+
+    'telegram' => [
+        'client_id'     => env('TELEGRAM_CLIENT_ID'),
+        'client_secret' => env('TELEGRAM_CLIENT_SECRET'),
+        'redirect'      => env('TELEGRAM_CLIENT_REDIRECT'),
+        'bot_link_url'     => env('TELEGRAM_BOT_LINK_URL'),
+        'bot_token'     => env('TELEGRAM_BOT_TOKEN'),
+    ],
+
 ];
