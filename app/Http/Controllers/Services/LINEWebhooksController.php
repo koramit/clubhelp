@@ -74,7 +74,7 @@ class LINEWebhooksController extends Controller
             $messages = [
                 [
                     'type' => 'text',
-                    'text' => "สวัสดี {$user->profle['full_name']} 😃\n\n Welcome to the Club!! ✌️",
+                    'text' => "สวัสดี {$user->profile['full_name']} 😃\n\n Welcome to the Club!! ✌️",
                 ],
             ];
         }
