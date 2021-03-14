@@ -56,20 +56,23 @@ class User extends Authenticatable
 
     public function getNotificationChannel()
     {
-        if ($this->profile['notification_channels'] === []) {
+        $channels = $this->profile['notification_channels'];
+        if ($channels === [] ||
+            ! $channels[$channels['provider']]['active'] // user unfollowed
+        ) {
             return null;
         }
 
-        return $this->profile['notification_channels'][$this->profile['notification_channels']['provider']];
+        return $channels[$channels['provider']];
     }
 
     public function setNotificationChannel($provider, $userId)
     {
-        $notificationChannels = $this->profile['notification_channels'];
-        $notificationChannels['provider'] = $provider;
-        $notificationChannels[$provider]['id'] = $userId;
-        $notificationChannels[$provider]['active'] = true;
-        $this->profile['notification_channels'] = $notificationChannels;
+        $channels = $this->profile['notification_channels'];
+        $channels['provider'] = $provider;
+        $channels[$provider]['id'] = $userId;
+        $channels[$provider]['active'] = true;
+        $this->profile['notification_channels'] = $channels;
         $this->save();
     }
 }
