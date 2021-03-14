@@ -10,7 +10,7 @@ import { InertiaProgress } from '@inertiajs/progress';
 
 InertiaProgress.init({
     delay: 200,
-    color: '#AD9C68'
+    color: '#94af76'
 });
 
 const el = document.getElementById('app');

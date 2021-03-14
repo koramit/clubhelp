@@ -74,7 +74,7 @@
                 </div>
                 <!-- menu on mobile -->
                 <div
-                    class="h-4/5 mx-1 md:hidden block fixed top-0 inset-x-0 overflow-y-scroll text-soft-theme-light bg-thick-theme-light rounded-bl-xl rounded-br-xl transition-transform transform duration-300 ease-in-out"
+                    class="h-4/5 mx-1 md:hidden block fixed top-0 inset-x-0 overflow-y-scroll text-soft-theme-light bg-dark-theme-light rounded-bl-xl rounded-br-xl transition-transform transform duration-300 ease-in-out"
                     :class="{ '-translate-y-full': !mobileMenuVisible }"
                 >
                     <div class="p-4">
