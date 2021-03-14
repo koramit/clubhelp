@@ -44,11 +44,13 @@ export default {
             }
             const script = document.createElement('script');
             script.async = true;
-            script.src = 'https://telegram.org/js/telegram-widget.js?12';
+            script.src = this.configs.telegram.widget_src;
             script.setAttribute('data-radius', '0');
             script.setAttribute('data-size', 'large');
             script.setAttribute('data-userpic', false);
-            script.setAttribute('data-request-access', null);
+            if (this.configs.telegram.request_access) {
+                script.setAttribute('data-request-access', this.configs.telegram.request_access);
+            }
             script.setAttribute('data-auth-url', this.configs.telegram.redirect);
             script.setAttribute('data-telegram-login', this.configs.telegram.client_id);
             this.$refs.telegram.appendChild(script);
