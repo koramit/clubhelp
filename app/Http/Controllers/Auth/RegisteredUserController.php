@@ -38,6 +38,7 @@ class RegisteredUserController extends Controller
             'name' => ['string', 'min:4', 'max:255', 'unique:users'],
             'email' => ['email'],
             'tel_no' => ['digits_between:9,10'],
+            'agreement_accepted' => ['required'],
             'org_id' => [
                 function ($attribute, $value, $fail) {
                     $userExist = User::where('profile->org_id', $value)->first();

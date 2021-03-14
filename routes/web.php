@@ -21,6 +21,10 @@ Route::get('/cases', function () {
     return \Inertia\Inertia::render('Encounters/Index');
 })->name('cases');
 
+Route::get('/policies', function () {
+    return \Inertia\Inertia::render('Policy');
+})->name('cases');
+
 // login
 Route::middleware('guest')->get('/login', [AuthenticatedSessionController::class, 'index'])->name('login');
 Route::middleware('guest')->get('/login/{provider}', [AuthenticatedSessionController::class, 'create']);

@@ -21,7 +21,6 @@
                     name="login"
                     label="login"
                     v-model="credential.login"
-                    placeholder="Siriraj AD"
                     :error="errors.activate"
                 />
                 <form-input
@@ -73,11 +72,22 @@
                     v-model="form.email"
                     :error="$page.props.errors.email"
                 />
+                <form-checkbox
+                    class="mt-4"
+                    v-model="form.agreement_accepted"
+                    label="Accept Policies"
+                    :toggler="true"
+                />
+                <a
+                    :href="`${$page.props.app.baseUrl}/policies`"
+                    class="mt-4 block text-thick-theme-light"
+                    target="_blank"
+                >Policies and Terms of use</a>
                 <spinner-button
                     :spin="busy"
                     class="btn-dark mt-6 w-full"
                     @click="register"
-                    :disabled="!form.name || !form.email || !form.tel_no"
+                    :disabled="!form.name || !form.email || !form.tel_no || !form.agreement_accepted"
                 >
                     REGISTER
                 </spinner-button>
@@ -87,10 +97,11 @@
 </template>
 
 <script>
+import FormCheckbox from '@/Components/Controls/FormCheckbox.vue';
 import FormInput from '@/Components/Controls/FormInput';
 import SpinnerButton from '@/Components/Controls/SpinnerButton';
 export default {
-    components: { FormInput, SpinnerButton },
+    components: { FormInput, FormCheckbox, SpinnerButton },
     props: {
         socialProfile: { type: Object, required: true }
     },
@@ -110,6 +121,7 @@ export default {
                 full_name: '',
                 name: '',
                 tel_no: '',
+                agreement_accepted:false
             },
         };
     },
