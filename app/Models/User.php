@@ -43,7 +43,7 @@ class User extends Authenticatable
 
     public function needQuarantine()
     {
-        if ($this->getNotificationChannel()) {
+        if (! $this->getNotificationChannel()) {
             return 'notification';
         }
 
