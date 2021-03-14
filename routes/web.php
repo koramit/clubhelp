@@ -4,7 +4,7 @@ use App\Http\Controllers\Auth\ActivatedUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\QuarantinedUserController;
-use App\Http\Controllers\Service\LINEWebhooksController;
+use App\Http\Controllers\Services\LINEWebhooksController;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 
