@@ -72,7 +72,9 @@ class User extends Authenticatable
         $channels['provider'] = $provider;
         $channels[$provider]['id'] = $userId;
         $channels[$provider]['active'] = true;
-        $this->profile['notification_channels'] = $channels;
+        $profile = $this->profile;
+        $profile['notification_channels'] = $channels;
+        $this->profile = $profile;
         $this->save();
     }
 }
