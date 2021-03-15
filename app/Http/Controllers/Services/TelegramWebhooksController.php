@@ -47,6 +47,8 @@ class TelegramWebhooksController extends Controller
                 'chat_id' => $this->update['message']['chat']['id'],
                 'text' => str_replace('PLACEHOLDER', $this->update['message']['chat']['username'], config('messages.bot_user_not_registred')),
             ]);
+
+            return;
         }
 
         if ($user->getNotificationChannel() === null) {
