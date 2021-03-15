@@ -93,7 +93,7 @@ class TelegramWebhooksController extends Controller
     {
         Http::post("{$this->baseEndpoint}sendMessage", [
             'chat_id' => $this->update['message']['chat']['id'],
-            'text' => str_replace('PLACEHOLDER', $this->update['message']['chat']['username'], config('messages.bot_user_not_registred')),
+            'text' => str_replace('PLACEHOLDER', $this->update['message']['chat']['username'], config('messages.bot_user_not_registred'))."\n\n เมื่อทำการลงทะเบียนแล้วอย่าลืม stop และ restart bot ด้วยน๊า 🤗",
         ]);
     }
 }
