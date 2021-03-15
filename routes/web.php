@@ -9,7 +9,6 @@ use App\Http\Controllers\Services\TelegramWebhooksController;
 use App\Http\Controllers\UserNotificationChannelController;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
-use Jenssegers\Agent\Facades\Agent;
 
 Route::get('/', function () {
     return Redirect::route('login');
@@ -47,8 +46,3 @@ Route::post('/webhooks/telegram/{token}', TelegramWebhooksController::class);
 
 // polling
 Route::middleware('auth')->post('/user-notification-channel', UserNotificationChannelController::class);
-
-// agetnt
-Route::get('/agent', function () {
-    return trim(request()->header('User-Agent').' '.(Agent::isRobot() ? Agent::robot() : ''));
-});
