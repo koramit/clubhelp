@@ -44,7 +44,7 @@ class TelegramWebhooksController extends Controller
     {
         if (! $this->user) {
             $this->replyUnauthorized();
-            Log::info('guest add telegram bot.'.$this->update['message']['chat']['username']);
+            Log::info('guest add telegram bot '.$this->update['message']['chat']['username']);
 
             return;
         }
