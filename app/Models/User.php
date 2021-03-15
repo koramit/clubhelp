@@ -68,12 +68,21 @@ class User extends Authenticatable
 
     public function setNotificationChannel($provider, $userId)
     {
-        $channels = $this->profile['notification_channels'];
-        $channels['provider'] = $provider;
-        $channels[$provider]['id'] = $userId;
-        $channels[$provider]['active'] = true;
         $profile = $this->profile;
-        $profile['notification_channels'] = $channels;
+        $profile['notification_channels']['provider'] = $provider;
+        $profile['notification_channels'][$provider]['id'] = $userId;
+        $profile['notification_channels'][$provider]['active'] = true;
+        $this->profile = $profile;
+        $this->save();
+    }
+
+    public function disableNotificationChannel($provider)
+    {
+        if (! isset($this->profile['notification_channels'][$provider])) {
+            return;
+        }
+        $profile = $this->profile;
+        $profile['notification_channels'][$provider]['active'] = false;
         $this->profile = $profile;
         $this->save();
     }
