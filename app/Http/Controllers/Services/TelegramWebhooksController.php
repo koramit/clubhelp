@@ -12,6 +12,7 @@ class TelegramWebhooksController extends Controller
 {
     protected $update;
     protected $baseEndpoint;
+    protected $user;
 
     public function __invoke($token)
     {
@@ -22,12 +23,12 @@ class TelegramWebhooksController extends Controller
         $this->baseEndpoint = 'https://api.telegram.org/bot'.config('services.telegram.bot_token').'/';
 
         $this->update = Request::all();
-        Log::info($this->update);
 
-        if (isset($this->update['message'])) { // message and add bot
+        if (isset($this->update['message'])) {
+            $this->user = User::where('profile->social->id', $this->update['message']['chat']['id'])->first();
             if (isset($this->update['message']['text'])) { // text message
-                if ($this->update['message']['text'] === '/start' ||
-                    $this->update['message']['text'] === '/restart'
+                if ($this->update['message']['text'] === '/start' || // start bot
+                    $this->update['message']['text'] === '/restart' // restart bot
                 ) {
                     return $this->handleSubscribe();
                 }
@@ -41,42 +42,59 @@ class TelegramWebhooksController extends Controller
 
     protected function handleSubscribe()
     {
-        $user = User::where('profile->social->id', $this->update['message']['chat']['id'])->first();
-
-        if (! $user) {
-            $response = Http::post("{$this->baseEndpoint}sendMessage", [
-                'chat_id' => $this->update['message']['chat']['id'],
-                'text' => str_replace('PLACEHOLDER', $this->update['message']['chat']['username'], config('messages.bot_user_not_registred')),
-            ]);
+        if (! $this->user) {
+            $this->replyUnauthorized();
+            Log::info('guest add telegram bot.'.$this->update['message']['chat']['username']);
 
             return;
         }
 
-        if ($user->getNotificationChannel() === null) {
-            $user->setNotificationChannel('telegram', $this->update['message']['chat']['id']);
+        if ($this->user->getNotificationChannel() === null) {
+            $this->user->setNotificationChannel('telegram', $this->update['message']['chat']['id']);
             $response = Http::post("{$this->baseEndpoint}sendMessage", [
                 'chat_id' => $this->update['message']['chat']['id'],
-                'text' => str_replace('PLACEHOLDER', $user->profile['full_name'], config('messages.bot_greeting')),
+                'text' => str_replace('PLACEHOLDER', $this->user->profile['full_name'], config('messages.bot_greeting')),
             ]);
         }
     }
 
     protected function handleUnsubscribe()
     {
-        $user = User::where('profile->social->id', $this->update['my_chat_member']['chat']['id'])->first();
-
-        if (isset($this->update['my_chat_member']['new_chat_member']) &&
-            $this->update['my_chat_member']['new_chat_member']['status'] === 'kicked'
+        if (! isset($this->update['my_chat_member']['new_chat_member']) ||
+            $this->update['my_chat_member']['new_chat_member']['status'] !== 'kicked'
         ) {
-            Log::info($this->update['my_chat_member']['chat']['username'].' unsubscrbed');
+            // do nothing
+            return;
         }
+        $user = User::where('profile->social->id', $this->update['my_chat_member']['chat']['id'])->first();
+        if (! $user) {
+            Log::info('guest '.$this->update['my_chat_member']['chat']['username'].' unsubscrbed Telegram bot');
+
+            return;
+        }
+        $user->disableNotificationChannel('telegram');
+        Log::info('user '.$user->profile['full_name'].' unsubscrbed Telegram bot');
     }
 
     protected function handleTextMessage()
     {
+        if (! $this->user) {
+            $this->replyUnauthorized();
+
+            return;
+        }
+
         $response = Http::post("{$this->baseEndpoint}sendMessage", [
             'chat_id' => $this->update['message']['chat']['id'],
             'text' => $this->update['message']['text'],
+        ]);
+    }
+
+    protected function replyUnauthorized()
+    {
+        Http::post("{$this->baseEndpoint}sendMessage", [
+            'chat_id' => $this->update['message']['chat']['id'],
+            'text' => str_replace('PLACEHOLDER', $this->update['message']['chat']['username'], config('messages.bot_user_not_registred')),
         ]);
     }
 }
