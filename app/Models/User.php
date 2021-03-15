@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Log;
 
 class User extends Authenticatable
 {
@@ -74,6 +75,7 @@ class User extends Authenticatable
         $profile['notification_channels'][$provider]['active'] = true;
         $this->profile = $profile;
         $this->save();
+        Log::info('user '.$this->name.' setup '.$provider.' notification');
     }
 
     public function disableNotificationChannel($provider)
@@ -85,5 +87,6 @@ class User extends Authenticatable
         $profile['notification_channels'][$provider]['active'] = false;
         $this->profile = $profile;
         $this->save();
+        Log::info('user '.$this->name.' disabled '.$provider.' notification');
     }
 }

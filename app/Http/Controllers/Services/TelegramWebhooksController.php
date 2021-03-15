@@ -51,7 +51,7 @@ class TelegramWebhooksController extends Controller
 
         if ($this->user->getNotificationChannel() === null) {
             $this->user->setNotificationChannel('telegram', $this->update['message']['chat']['id']);
-            $response = Http::post("{$this->baseEndpoint}sendMessage", [
+            Http::post("{$this->baseEndpoint}sendMessage", [
                 'chat_id' => $this->update['message']['chat']['id'],
                 'text' => str_replace('PLACEHOLDER', $this->user->profile['full_name'], config('messages.bot_greeting')),
             ]);
@@ -73,7 +73,6 @@ class TelegramWebhooksController extends Controller
             return;
         }
         $user->disableNotificationChannel('telegram');
-        Log::info('user '.$user->profile['full_name'].' unsubscrbed Telegram bot');
     }
 
     protected function handleTextMessage()
