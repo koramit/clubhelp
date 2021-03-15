@@ -29,15 +29,16 @@ class TelegramWebhooksController extends Controller
                 if ($this->update['message']['text'] === '/start' ||
                     $this->update['message']['text'] === '/restart'
                 ) {
-                    $this->handleSubscript();
+                    $this->handleSubscribe();
                 }
                 $this->handleTextMessage();
             }
         } elseif (isset($this->update['my_chat_member'])) { // blocked/unblock
+            $this->handleUnsubscribe();
         }
     }
 
-    protected function handleSubscript()
+    protected function handleSubscribe()
     {
         $user = User::where('profile->social->id', $this->update['message']['chat']['id'])->first();
 
@@ -57,10 +58,21 @@ class TelegramWebhooksController extends Controller
         }
     }
 
+    protected function handleUnsubscribe()
+    {
+        $user = User::where('profile->social->id', $this->update['my_chat_member']['chat']['id'])->first();
+
+        if (isset($this->update['my_chat_member']['old_chat_member']) &&
+            $this->update['my_chat_member']['old_chat_member']['status'] === 'kicked'
+        ) {
+            Log::info($this->update['my_chat_member']['chat']['username'].' unsubscrbed');
+        }
+    }
+
     protected function handleTextMessage()
     {
         $response = Http::post("{$this->baseEndpoint}sendMessage", [
-            'chad_id' => $this->update['message']['chat']['id'],
+            'chat_id' => $this->update['message']['chat']['id'],
             'text' => strrev($this->update['message']['text']),
         ]);
     }
