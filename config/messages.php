@@ -1,6 +1,6 @@
 <?php
 
-$url = url('/login');
+$url = env('APP_URL').'/login';
 
 return [
     'bot_greeting' => "สวัสดี PLACEHOLDER 😃\n\n Welcome to the Club!! ✌️",
