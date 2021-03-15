@@ -25,9 +25,9 @@ class TelegramWebhooksController extends Controller
         Log::info($this->update);
 
         if (isset($this->update['message'])) { // message and add bot
-            if (isset($this->update['text'])) { // text message
-                if ($this->update['text'] === '/start' ||
-                    $this->update['text'] === '/restart'
+            if (isset($this->update['message']['text'])) { // text message
+                if ($this->update['message']['text'] === '/start' ||
+                    $this->update['message']['text'] === '/restart'
                 ) {
                     $this->handleSubscript();
                 }
@@ -39,19 +39,19 @@ class TelegramWebhooksController extends Controller
 
     protected function handleSubscript()
     {
-        $user = User::where('profile->social->id', $this->update['chat']['id'])->first();
+        $user = User::where('profile->social->id', $this->update['message']['chat']['id'])->first();
 
         if (! $user) {
             $response = Http::post("{$this->baseEndpoint}sendMessage", [
-                'chat_id' => $this->update['chat']['id'],
-                'text' => str_replace('PLACEHOLDER', $this->update['chat']['username'], config('messages.bot_user_not_registred')),
+                'chat_id' => $this->update['message']['chat']['id'],
+                'text' => str_replace('PLACEHOLDER', $this->update['message']['chat']['username'], config('messages.bot_user_not_registred')),
             ]);
         }
 
         if ($user->getNotificationChannel() === null) {
-            $user->setNotificationChannel('telegram', $this->update['chat']['id']);
+            $user->setNotificationChannel('telegram', $this->update['message']['chat']['id']);
             $response = Http::post("{$this->baseEndpoint}sendMessage", [
-                'chat_id' => $this->update['chat']['id'],
+                'chat_id' => $this->update['message']['chat']['id'],
                 'text' => str_replace('PLACEHOLDER', $user->profile['full_name'], config('messages.bot_greeting')),
             ]);
         }
@@ -60,8 +60,8 @@ class TelegramWebhooksController extends Controller
     protected function handleTextMessage()
     {
         $response = Http::post("{$this->baseEndpoint}sendMessage", [
-            'chad_id' => $this->update['chat']['id'],
-            'text' => strrev($this->update['text']),
+            'chad_id' => $this->update['message']['chat']['id'],
+            'text' => strrev($this->update['message']['text']),
         ]);
     }
 }
