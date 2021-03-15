@@ -29,12 +29,13 @@ class TelegramWebhooksController extends Controller
                 if ($this->update['message']['text'] === '/start' ||
                     $this->update['message']['text'] === '/restart'
                 ) {
-                    $this->handleSubscribe();
+                    return $this->handleSubscribe();
                 }
-                $this->handleTextMessage();
+
+                return $this->handleTextMessage();
             }
         } elseif (isset($this->update['my_chat_member'])) { // blocked/unblock
-            $this->handleUnsubscribe();
+            return $this->handleUnsubscribe();
         }
     }
 
@@ -75,7 +76,7 @@ class TelegramWebhooksController extends Controller
     {
         $response = Http::post("{$this->baseEndpoint}sendMessage", [
             'chat_id' => $this->update['message']['chat']['id'],
-            'text' => strrev($this->update['message']['text']),
+            'text' => $this->update['message']['text'],
         ]);
     }
 }
