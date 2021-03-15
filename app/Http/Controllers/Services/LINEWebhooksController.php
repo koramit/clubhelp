@@ -56,31 +56,26 @@ class LINEWebhooksController extends Controller
         $profile = $response->json();
         $user = User::where('profile->social->id', $event['source']['userId'])->first();
 
+        $messages = [];
         if (! $user) {
             $url = url('/');
-            $this->replyMessage($event['replyToken'], [
-                [
-                    'type' => 'text',
-                    'text' => "ขออภัย {$profile['displayName']} 🙏\nยังไม่สามารถให้บริการท่านได้ \n\nโปรดลงทำการลงทะเบียนก่อนที่ {$url}\n\n😅",
-                ],
-            ]);
-
-            return;
+            $messages[] = [ //bot_user_not_found
+                'type' => 'text',
+                'text' => str_replace('PLACEHOLDER', $profile['displayName'], config('messages.bot_user_not_registred')),
+            ];
         }
 
         // reply
         if ($user->getNotificationChannel() === null) {
             $user->setNotificationChannel('line', $event['source']['userId']);
-            $messages = [
-                [
-                    'type' => 'text',
-                    'text' => "สวัสดี {$user->profile['full_name']} 😃\n\n Welcome to the Club!! ✌️",
-                ],
+            $messages = [ // bot_greeting
+                'type' => 'text',
+                'text' => str_replace('PLACEHOLDER', $user->profile['full_name'], config('messages.bot_greeting')),
             ];
+            // save or update profile
         }
-        $this->replyMessage($event['replyToken'], $messages);
 
-        // save or update profile
+        $this->replyMessage($event['replyToken'], $messages);
     }
 
     protected function unfollow($event)
