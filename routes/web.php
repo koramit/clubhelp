@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\QuarantinedUserController;
 use App\Http\Controllers\Services\LINEWebhooksController;
 use App\Http\Controllers\Services\TelegramWebhooksController;
+use App\Http\Controllers\UserNotificationChannelController;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 
@@ -42,3 +43,6 @@ Route::middleware('auth')->get('/quarantine', QuarantinedUserController::class)-
 // webhooks
 Route::post('/webhooks/line', LINEWebhooksController::class);
 Route::post('/webhooks/telegram/{token}', TelegramWebhooksController::class);
+
+// polling
+Route::middleware('auth')->post('/user-notification-channel', UserNotificationChannelController::class);

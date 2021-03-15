@@ -28,12 +28,14 @@
 
 <script>
 import Icon from '@/Components/Helpers/Icon.vue';
+import axios from 'axios';
 export default {
     components: { Icon },
     props: {
         mode: { type: String, required: true },
         socialProvider: { type: String, required: true },
         botLink: { type: String, default: '' },
+        redirectTo: { type: String, default: 'cases' }
     },
     computed: {
         setupNotificationLabel () {
@@ -42,13 +44,40 @@ export default {
                 'Please add Telegram bot';
         }
     },
+    data () {
+        return {
+            pollingCount: 0
+        };
+    },
     mounted() {
         this.$nextTick(() => {
             const pageLoadingIndicator = document.getElementById('page-loading-indicator');
             if (pageLoadingIndicator) {
                 pageLoadingIndicator.remove();
             }
+            if (this.mode === 'notification') {
+                setTimeout(this.checkNotificationChannel, 10000);
+            }
         });
+
+    },
+    methods: {
+        checkNotificationChannel () {
+            axios.post(`${this.$page.props.app.baseUrl}/user-notification-channel`)
+                .then(response => {
+                    if (response.data) {
+                        console.log(response.data);
+                        this.$inertia.get(`${this.$page.props.app.baseUrl}/${this.redirectTo}`);
+                    } else {
+                        if (this.pollingCount < 100) {
+                            this.pollingCount++;
+                            setTimeout(this.checkNotificationChannel, 3000);
+                        }
+                    }
+                }).catch(error => {
+                    console.log(error);
+                });
+        }
     }
 };
 </script>
