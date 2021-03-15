@@ -86,6 +86,10 @@ class LINEWebhooksController extends Controller
     protected function unfollow($event)
     {
         Log::info($event['source']['userId'].' unfollow');
+        $user = User::where('profile->social->id', $event['source']['userId'])->first();
+        if ($user) {
+            $user->disableNotificationChannel('line');
+        }
     }
 
     protected function message($event)
