@@ -25,7 +25,7 @@ class TelegramWebhooksController extends Controller
         $this->update = Request::all();
 
         if (isset($this->update['message'])) {
-            $this->user = User::where('profile->social->id', $this->update['message']['chat']['id'])->first();
+            $this->user = User::where('profile->social->id', strval($this->update['message']['chat']['id']))->first();
             if (isset($this->update['message']['text'])) { // text message
                 if ($this->update['message']['text'] === '/start' || // start bot
                     $this->update['message']['text'] === '/restart' // restart bot
@@ -66,7 +66,7 @@ class TelegramWebhooksController extends Controller
             // do nothing
             return;
         }
-        $user = User::where('profile->social->id', $this->update['my_chat_member']['chat']['id'])->first();
+        $user = User::where('profile->social->id', strval($this->update['my_chat_member']['chat']['id']))->first();
         if (! $user) {
             Log::info('guest '.$this->update['my_chat_member']['chat']['username'].' unsubscrbed Telegram bot');
 
