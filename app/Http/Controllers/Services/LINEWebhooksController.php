@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Request;
 class LINEWebhooksController extends Controller
 {
     protected $client;
+    protected $user;
 
     /**
      * LINE request limit as of 2021-03-14
@@ -28,6 +29,7 @@ class LINEWebhooksController extends Controller
         }
 
         foreach (Request::input('events') as $event) {
+            $this->user = User::where('profile->social->id', $event['source']['userId'])->first();
             if ($event['type'] == 'follow') {
                 $this->follow($event);
             } elseif ($event['type'] == 'unfollow') {
@@ -45,48 +47,31 @@ class LINEWebhooksController extends Controller
     protected function follow($event)
     {
         // get profile
-        // $response = Http::withToken(config('services.line.bot_token'))
-        //                 ->get('https://api.line.me/v2/bot/profile/'.$event['source']['userId']);
-        $response = $this->client->get('https://api.line.me/v2/bot/profile/'.$event['source']['userId']);
-        $profile = $response->json();
-        $user = User::where('profile->social->id', $event['source']['userId'])->first();
+        $profile = $this->getProfile($event['source']['userId']);
 
-        if (! $user) {
-            // $url = url('/');
-            // $messages = [[
-            //     'type' => 'text',
-            //     'text' => str_replace('PLACEHOLDER', $profile['displayName'], config('messages.bot_user_not_registred')),
-            // ]];
+        if (! $this->user) {
             //bot_user_not_found
-            $this->replyMessage($event['replyToken'], [[
-                'type' => 'text',
-                'text' => str_replace('PLACEHOLDER', $profile['displayName'], config('messages.bot_user_not_registred')),
-            ]]);
+            $this->replyUnauthorized($event['replyToken'], $profile['displayName']);
 
             return;
         }
 
         // reply
-        if ($user->getNotificationChannel() === null) {
-            $user->setNotificationChannel('line', $event['source']['userId']);
-            // $messages[] = [[
-            //     'type' => 'text',
-            //     'text' => str_replace('PLACEHOLDER', $user->profile['full_name'], config('messages.bot_greeting')),
-            // ]];
-            // bot_greeting
+        if ($this->user->getNotificationChannel() === null) {
+            $this->user->setNotificationChannel('line', $event['source']['userId']);
             $this->replyMessage($event['replyToken'], [[
                 'type' => 'text',
-                'text' => str_replace('PLACEHOLDER', $user->profile['full_name'], config('messages.bot_greeting')),
+                'text' => str_replace('PLACEHOLDER', $this->user->profile['full_name'], config('messages.bot_greeting')),
             ]]);
         }
-        // save or update profile
+
+        // need save or update profile
     }
 
     protected function unfollow($event)
     {
-        $user = User::where('profile->social->id', $event['source']['userId'])->first();
-        if ($user) {
-            $user->disableNotificationChannel('line');
+        if ($this->user) {
+            $this->user->disableNotificationChannel('line');
         } else {
             Log::info('guest '.$event['source']['userId'].' unsubscrbed LINE bot');
         }
@@ -94,17 +79,19 @@ class LINEWebhooksController extends Controller
 
     protected function message($event)
     {
+        if (! $this->user) {
+            $profile = $this->getProfile($event['source']['userId']);
+            $this->replyUnauthorized($event['replyToken'], $profile['displayName']);
+        }
         $messages = [[
             'type' => 'text',
-            'text' => strrev($event['message']['text']),
+            'text' => $event['message']['text'],
         ]];
         $this->replyMessage($event['replyToken'], $messages);
     }
 
     protected function replyMessage($replyToken, $messages)
     {
-        // reply
-        // $response = Http::withToken(config('services.line.bot_token'))
         $this->client->post('https://api.line.me/v2/bot/message/reply', [
             'replyToken' => $replyToken,
             'messages' => $messages,
@@ -113,12 +100,24 @@ class LINEWebhooksController extends Controller
 
     protected function pushMessage($userId, $messages)
     {
-        // push
-        // $response = Http::withToken(config('services.line.bot_token'))
-
         $this->client->post('https://api.line.me/v2/bot/message/push', [
             'to' => $userId,
             'messages' => $messages,
         ]);
+    }
+
+    protected function getProfile($userId)
+    {
+        $response = $this->client->get('https://api.line.me/v2/bot/profile/'.$userId);
+
+        return $response->json();
+    }
+
+    protected function replyUnauthorized($token, $username)
+    {
+        $this->replyMessage($token, [[
+            'type' => 'text',
+            'text' => str_replace('PLACEHOLDER', $username, config('messages.bot_user_not_registred'))."\n\n เมื่อทำการลงทะเบียนแล้วอย่าลืม block และ unblock bot ด้วยน๊า 🤗",
+        ]]);
     }
 }
