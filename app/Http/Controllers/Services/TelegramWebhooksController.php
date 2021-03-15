@@ -64,8 +64,8 @@ class TelegramWebhooksController extends Controller
     {
         $user = User::where('profile->social->id', $this->update['my_chat_member']['chat']['id'])->first();
 
-        if (isset($this->update['my_chat_member']['old_chat_member']) &&
-            $this->update['my_chat_member']['old_chat_member']['status'] === 'kicked'
+        if (isset($this->update['my_chat_member']['new_chat_member']) &&
+            $this->update['my_chat_member']['new_chat_member']['status'] === 'kicked'
         ) {
             Log::info($this->update['my_chat_member']['chat']['username'].' unsubscrbed');
         }
