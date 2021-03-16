@@ -4,24 +4,16 @@ use App\Http\Controllers\Auth\ActivatedUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\EncounterSubscriptionsController;
+use App\Http\Controllers\PagesController;
 use App\Http\Controllers\PatientDataAPIController;
 use App\Http\Controllers\QuarantinedUserController;
 use App\Http\Controllers\Services\LINEWebhooksController;
 use App\Http\Controllers\Services\TelegramWebhooksController;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return Redirect::route('login');
-});
-
-Route::get('/logo', function () {
-    return view('logo');
-});
-
-Route::get('/policies', function () {
-    return \Inertia\Inertia::render('Policy');
-})->name('policies');
+// Pages
+Route::get('/', [PagesController::class, 'welcome']);
+Route::get('/policies', [PagesController::class, 'policies'])->name('policies');
 
 // login
 Route::middleware('guest')->get('/login', [AuthenticatedSessionController::class, 'index'])->name('login');
