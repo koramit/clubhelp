@@ -6,7 +6,6 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\QuarantinedUserController;
 use App\Http\Controllers\Services\LINEWebhooksController;
 use App\Http\Controllers\Services\TelegramWebhooksController;
-use App\Http\Controllers\UserNotificationChannelController;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 
@@ -18,13 +17,13 @@ Route::get('/logo', function () {
     return view('logo');
 });
 
-Route::get('/cases', function () {
+Route::middleware('qualify')->get('/cases', function () {
     return \Inertia\Inertia::render('Encounters/Index');
 })->name('cases');
 
 Route::get('/policies', function () {
     return \Inertia\Inertia::render('Policy');
-})->name('cases');
+})->name('policies');
 
 // login
 Route::middleware('guest')->get('/login', [AuthenticatedSessionController::class, 'index'])->name('login');
@@ -38,11 +37,9 @@ Route::middleware('guest')->post('/register', [RegisteredUserController::class, 
 Route::middleware('guest')->post('/activate', ActivatedUserController::class);
 
 // quarantine user
-Route::middleware('auth')->get('/quarantine', QuarantinedUserController::class)->name('quarantine');
+Route::middleware('auth')->get('/quarantine', [QuarantinedUserController::class, 'index'])->name('quarantine');
+Route::middleware('auth')->get('/quarantine/{mode}', [QuarantinedUserController::class, 'show']);
 
 // webhooks
 Route::post('/webhooks/line', LINEWebhooksController::class);
 Route::post('/webhooks/telegram/{token}', TelegramWebhooksController::class);
-
-// polling
-Route::middleware('auth')->post('/user-notification-channel', UserNotificationChannelController::class);

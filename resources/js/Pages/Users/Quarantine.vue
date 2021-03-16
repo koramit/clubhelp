@@ -63,7 +63,7 @@ export default {
     },
     methods: {
         checkNotificationChannel () {
-            axios.post(`${this.$page.props.app.baseUrl}/user-notification-channel`)
+            axios.get(`${this.$page.props.app.baseUrl}/quarantine/notification`)
                 .then(response => {
                     if (response.data) {
                         console.log(response.data);
@@ -71,7 +71,7 @@ export default {
                     } else {
                         if (this.pollingCount < 100) {
                             this.pollingCount++;
-                            setTimeout(this.checkNotificationChannel, 3000);
+                            setTimeout(this.checkNotificationChannel, 5000);
                         }
                     }
                 }).catch(error => {
