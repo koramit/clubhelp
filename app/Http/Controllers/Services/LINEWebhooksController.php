@@ -61,7 +61,7 @@ class LINEWebhooksController extends Controller
             $this->user->setNotificationChannel('line', $event['source']['userId']);
             $this->replyMessage($event['replyToken'], [[
                 'type' => 'text',
-                'text' => str_replace('PLACEHOLDER', $this->user->profile['full_name'], config('messages.bot_greeting')),
+                'text' => __('reply_messages.bot.greeting', ['PLACEHOLDER' => $this->user->profile['full_name']]),
             ]]);
         }
 
@@ -118,6 +118,7 @@ class LINEWebhooksController extends Controller
         $this->replyMessage($token, [[
             'type' => 'text',
             'text' => str_replace('PLACEHOLDER', $username, config('messages.bot_user_not_registred'))."\n\n เมื่อทำการลงทะเบียนแล้วอย่าลืม block และ unblock bot ด้วยน๊า 🤗",
+            'text' => __('reply_messages.bot.user_not_registered', ['PLACEHOLDER' => $username, 'STOP' => 'block', 'RESTART' => 'unblock']),
         ]]);
     }
 }
