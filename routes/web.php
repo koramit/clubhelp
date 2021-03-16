@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\ActivatedUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\EncounterSubscriptionsController;
+use App\Http\Controllers\PatientDataAPIController;
 use App\Http\Controllers\QuarantinedUserController;
 use App\Http\Controllers\Services\LINEWebhooksController;
 use App\Http\Controllers\Services\TelegramWebhooksController;
@@ -41,6 +42,9 @@ Route::middleware('auth')->get('/quarantine/{mode}', [QuarantinedUserController:
 // webhooks
 Route::post('/webhooks/line', LINEWebhooksController::class);
 Route::post('/webhooks/telegram/{token}', TelegramWebhooksController::class);
+
+// frontend apis
+Route::middleware('qualify')->post('/search-patient/{hn}', PatientDataAPIController::class);
 
 // Features
 Route::middleware('qualify')->get('/cases', [EncounterSubscriptionsController::class, 'index'])->name('cases');

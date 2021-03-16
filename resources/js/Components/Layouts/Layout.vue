@@ -189,7 +189,13 @@ export default {
         },
         actionClicked (action) {
             this.mobileMenuVisible = false;
-            this.$nextTick(() => this.eventBus.emit('action-clicked', action));
+            // this.$nextTick(() => {
+            //     this.doubleRequestAnimationFrame(() => this.eventBus.emit('action-clicked', action));
+            // });
+
+            setTimeout(() => {
+                this.doubleRequestAnimationFrame(() => this.eventBus.emit('action-clicked', action));
+            }, 300); // equal to animate duration
         },
         doubleRequestAnimationFrame (callback) {
             requestAnimationFrame(() => {

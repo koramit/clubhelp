@@ -3,7 +3,6 @@
 namespace App\APIs;
 
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Request;
 
 class SmuggleAPI
 {
@@ -11,8 +10,8 @@ class SmuggleAPI
     {
         $data = [
             'function' => 'authenticate',
-            'org_id'   => Request::input('login'),
-            'password' => Request::input('password'),
+            'org_id'   => $login,
+            'password' => $password,
         ];
 
         $data = $this->makePost($data);
@@ -26,6 +25,58 @@ class SmuggleAPI
         }
         $data['password_expires_in_days'] = $data['password_days_left'];
         unset($data['password_days_left']);
+
+        return $data;
+    }
+
+    public function getPatient($hn)
+    {
+        $data = [
+            'function' => 'patient',
+            'hn'   => $hn,
+        ];
+        $data = $this->makePost($data);
+
+        $data['found'] = $data['reply_code'] == 0;
+        unset($data['reply_code']);
+        unset($data['reply_text']);
+        if (! $data['found']) {
+            $data['message'] = __('reply_messages.frontend_api.item_not_found', ['item' => 'patient']);
+
+            return $data;
+        }
+
+        return $data;
+    }
+
+    public function recentlyAdmission($hn)
+    {
+        $data = [
+            'function' => 'recently-admit',
+            'hn'   => $hn,
+        ];
+        $data = $this->makePost($data);
+
+        $data['found'] = $data['reply_code'] == 0;
+        unset($data['reply_code']);
+        unset($data['reply_text']);
+        if ($data['found']) {
+            unset($data['patient']['reply_code']);
+            unset($data['patient']['reply_text']);
+            $data['patient']['found'] = true;
+
+            return $data;
+        }
+
+        $data['message'] = __('reply_messages.frontend_api.item_not_found', ['item' => 'admission']);
+        $data['patient']['found'] = $data['patient']['reply_code'] == 0;
+        unset($data['patient']['reply_code']);
+        unset($data['patient']['reply_text']);
+        if ($data['patient']['found']) {
+            return $data;
+        }
+
+        $data['patient']['message'] = __('reply_messages.frontend_api.item_not_found', ['item' => 'patient']);
 
         return $data;
     }
