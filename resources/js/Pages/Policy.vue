@@ -63,6 +63,9 @@
 
 <script>
 export default {
+    created () {
+        document.title = 'Policies and Terms';
+    },
     mounted() {
         this.$nextTick(() => {
             const pageLoadingIndicator = document.getElementById('page-loading-indicator');

@@ -125,6 +125,9 @@ export default {
             },
         };
     },
+    created () {
+        document.title = 'Register';
+    },
     mounted() {
         this.$nextTick(function () {
             const pageLoadingIndicator = document.getElementById('page-loading-indicator');

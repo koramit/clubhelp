@@ -36,6 +36,9 @@ export default {
     props: {
         configs: { type: Object, default: () => {} }
     },
+    created () {
+        document.title = 'Login';
+    },
     mounted() {
         this.$nextTick(function () {
             const pageLoadingIndicator = document.getElementById('page-loading-indicator');
@@ -56,8 +59,6 @@ export default {
             this.$refs.telegram.appendChild(script);
         });
     }
-
-
 };
 </script>
 
