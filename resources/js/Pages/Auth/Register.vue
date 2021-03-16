@@ -100,6 +100,7 @@
 import FormCheckbox from '@/Components/Controls/FormCheckbox.vue';
 import FormInput from '@/Components/Controls/FormInput';
 import SpinnerButton from '@/Components/Controls/SpinnerButton';
+import axios from 'axios';
 export default {
     components: { FormInput, FormCheckbox, SpinnerButton },
     props: {
