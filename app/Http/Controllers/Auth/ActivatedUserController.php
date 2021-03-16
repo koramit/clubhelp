@@ -12,17 +12,13 @@ class ActivatedUserController extends Controller
     public function __invoke()
     {
         $api = new SmuggleAPI();
-
-        // check dubplicate org_id
         $data = $api->authenticate(Request::input('login'), Request::input('password'));
-
         if (! $data['found']) {
             return $data;
         }
 
         $userExist = User::where('profile->org_id', $data['org_id'])->first();
         $login = Request::input('login');
-
         if (! $userExist) {
             $data['login'] = $login;
 
