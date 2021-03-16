@@ -34,8 +34,8 @@ class SmuggleAPI
     {
         $response = Http::withHeaders([
                             'Accept' => 'application/json',
-                            'token'  => 'NJwjgOKTuHYdggzcwupCKqZT53ce6ODfx0mO8p3KXfGyAJ0dXBVMBi926QRlC6CK',
-                            'secret' => 'secret',
+                            'token'  => config('services.data_api_token'),
+                            'secret' => config('services.data_api_secret'),
                         ])
                         ->timeout(8)
                         ->post('https://sakid.co/smuggle/accio', $data);

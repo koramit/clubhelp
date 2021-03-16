@@ -48,4 +48,7 @@ return [
         'request_access'     => env('TELEGRAM_REQUEST_ACCESS', null),
     ],
 
+    'data_api_token' => env('DATA_API_TOKEN', null),
+    'data_api_secret' => env('DATA_API_SECRET', null),
+
 ];
