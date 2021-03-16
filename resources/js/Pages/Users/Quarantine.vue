@@ -22,6 +22,35 @@
                     </div>
                 </div>
             </div>
+            <div v-else-if="mode === 'reactivation'">
+                <div class="font-semibold mt-4 text-dark-theme-light">
+                    <span class="block text-center">Please reactivate your account</span>
+                    <div>
+                        <form-input
+                            class="mt-8"
+                            name="login"
+                            label="login"
+                            v-model="credential.login"
+                            :error="errors.activate"
+                        />
+                        <form-input
+                            class="mt-6"
+                            type="password"
+                            name="password"
+                            label="password"
+                            v-model="credential.password"
+                        />
+                        <spinner-button
+                            :spin="busy"
+                            class="btn-dark mt-6 w-full"
+                            @click="activate"
+                            :disabled="!credential.login || !credential.password"
+                        >
+                            ACTIVATE
+                        </spinner-button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -29,8 +58,10 @@
 <script>
 import Icon from '@/Components/Helpers/Icon.vue';
 import axios from 'axios';
+import FormInput from '@/Components/Controls/FormInput';
+import SpinnerButton from '@/Components/Controls/SpinnerButton';
 export default {
-    components: { Icon },
+    components: { Icon, FormInput, SpinnerButton },
     props: {
         mode: { type: String, required: true },
         socialProvider: { type: String, required: true },
@@ -46,8 +77,19 @@ export default {
     },
     data () {
         return {
-            pollingCount: 0
+            pollingCount: 0,
+            credential: {
+                login: '',
+                password: '',
+            },
+            errors: {
+                activate: ''
+            },
+            busy: false,
         };
+    },
+    created () {
+        document.title = 'Quarantine';
     },
     mounted() {
         this.$nextTick(() => {
@@ -77,7 +119,24 @@ export default {
                 }).catch(error => {
                     console.log(error);
                 });
-        }
+        },
+        activate () {
+            this.busy = true;
+            this.errors.activate = '';
+            axios.post(`${this.$page.props.app.baseUrl}/quarantine`, this.credential)
+                .then(response => {
+                    if (response.data.found) {
+                        this.$inertia.get(`${this.$page.props.app.baseUrl}/${this.redirectTo}`);
+                    } else {
+                        this.errors.activate = response.data.message;
+                        this.credential.password = '';
+                    }
+                    this.busy = false;
+                }).catch(error => {
+                    this.errors.activate = 'Service unavailable at the moment, please try again.';
+                    this.busy = false;
+                });
+        },
     }
 };
 </script>

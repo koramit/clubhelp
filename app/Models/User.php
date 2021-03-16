@@ -49,7 +49,7 @@ class User extends Authenticatable
         }
 
         if ($this->next_activation_at->isPast()) {
-            return 'activation';
+            return 'reactivation';
         }
 
         return false;
@@ -88,5 +88,11 @@ class User extends Authenticatable
         $this->profile = $profile;
         $this->save();
         Log::info('user '.$this->name.' disabled '.$provider.' notification');
+    }
+
+    public function reactivate($days)
+    {
+        $this->next_activation_at = $this->next_activation_at->addDays($days);
+        $this->save();
     }
 }

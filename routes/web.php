@@ -38,6 +38,7 @@ Route::middleware('guest')->post('/activate', ActivatedUserController::class);
 
 // quarantine user
 Route::middleware('auth')->get('/quarantine', [QuarantinedUserController::class, 'index'])->name('quarantine');
+Route::middleware('auth')->post('/quarantine', [QuarantinedUserController::class, 'store']);
 Route::middleware('auth')->get('/quarantine/{mode}', [QuarantinedUserController::class, 'show']);
 
 // webhooks
