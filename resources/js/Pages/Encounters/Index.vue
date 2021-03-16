@@ -5,8 +5,16 @@
 </template>
 
 <script>
-import Layout from '@/Components/Layouts/Layout.vue';
+import Layout from '@/Components/Layouts/Layout';
 export default {
-    layout: Layout
+    layout: Layout,
+    created () {
+        this.eventBus.on('action-clicked', action => this.handleAction(action));
+    },
+    methods: {
+        handleAction(action) {
+            alert(action);
+        }
+    }
 };
 </script>

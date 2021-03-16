@@ -119,6 +119,7 @@
                             @click="mobileMenuVisible = false"
                             :url="url()"
                         />
+                        <action-menu @action-clicked="actionClicked" />
                     </div>
                 </div>
             </div>
@@ -143,16 +144,13 @@
 </template>
 
 <script>
-import Dropdown from '@/Components/Helpers/Dropdown.vue';
-import Icon from '@/Components/Helpers/Icon.vue';
-import MainMenu from '@/Components/Helpers/MainMenu.vue';
+import Dropdown from '@/Components/Helpers/Dropdown';
+import Icon from '@/Components/Helpers/Icon';
+import MainMenu from '@/Components/Helpers/MainMenu';
+import ActionMenu from '@/Components/Helpers/ActionMenu';
 import { onMounted } from 'vue';
 export default {
-    components: {
-        Dropdown,
-        Icon,
-        MainMenu
-    },
+    components: { Dropdown, Icon, MainMenu, ActionMenu },
     watch: {
         '$page.props.flash': {
             immediate: true,
@@ -188,6 +186,15 @@ export default {
     methods: {
         url() {
             return location.pathname.substr(1);
+        },
+        actionClicked (action) {
+            this.mobileMenuVisible = false;
+            this.$nextTick(() => this.eventBus.emit('action-clicked', action));
+        },
+        doubleRequestAnimationFrame (callback) {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(callback);
+            });
         },
     }
 };

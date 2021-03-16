@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\ActivatedUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\EncounterSubscriptionsController;
 use App\Http\Controllers\QuarantinedUserController;
 use App\Http\Controllers\Services\LINEWebhooksController;
 use App\Http\Controllers\Services\TelegramWebhooksController;
@@ -16,10 +17,6 @@ Route::get('/', function () {
 Route::get('/logo', function () {
     return view('logo');
 });
-
-Route::middleware('qualify')->get('/cases', function () {
-    return \Inertia\Inertia::render('Encounters/Index');
-})->name('cases');
 
 Route::get('/policies', function () {
     return \Inertia\Inertia::render('Policy');
@@ -44,3 +41,6 @@ Route::middleware('auth')->get('/quarantine/{mode}', [QuarantinedUserController:
 // webhooks
 Route::post('/webhooks/line', LINEWebhooksController::class);
 Route::post('/webhooks/telegram/{token}', TelegramWebhooksController::class);
+
+// Features
+Route::middleware('qualify')->get('/cases', [EncounterSubscriptionsController::class, 'index'])->name('cases');
