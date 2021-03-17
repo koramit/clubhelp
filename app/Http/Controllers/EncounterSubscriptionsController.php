@@ -24,4 +24,12 @@ class EncounterSubscriptionsController extends Controller
 
         return Inertia::render('Encounters/Index');
     }
+
+    public function store()
+    {
+        // if ()
+        // 1. check if new visit
+        // 2. check if already visit
+        // 3. check if already subscribed
+    }
 }

@@ -40,3 +40,4 @@ Route::middleware('qualify')->post('/search-patient/{hn}', PatientDataAPIControl
 
 // Features
 Route::middleware('qualify')->get('/cases', [EncounterSubscriptionsController::class, 'index'])->name('cases');
+Route::middleware('qualify')->post('/cases', [EncounterSubscriptionsController::class, 'store']);

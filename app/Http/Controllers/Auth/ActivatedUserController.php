@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\APIs\SmuggleAPI;
+use App\Contracts\AuthenticationAPI;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Support\Facades\Request;
 
 class ActivatedUserController extends Controller
 {
-    public function __invoke()
+    public function __invoke(AuthenticationAPI $api)
     {
-        $api = new SmuggleAPI();
         $data = $api->authenticate(Request::input('login'), Request::input('password'));
         if (! $data['found']) {
             return $data;

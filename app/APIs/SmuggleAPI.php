@@ -2,9 +2,11 @@
 
 namespace App\APIs;
 
+use App\Contracts\AuthenticationAPI;
+use App\Contracts\PatientAPI;
 use Illuminate\Support\Facades\Http;
 
-class SmuggleAPI
+class SmuggleAPI implements PatientAPI, AuthenticationAPI
 {
     public function authenticate($login, $password)
     {
@@ -64,6 +66,11 @@ class SmuggleAPI
             unset($data['patient']['reply_code']);
             unset($data['patient']['reply_text']);
             $data['patient']['found'] = true;
+
+            $data['encountered_at'] = $data['datetime_admit'];
+            $data['dismissed_at'] = $data['datetime_dc'];
+            unset($data['datetime_admit']);
+            unset($data['datetime_dc']);
 
             return $data;
         }
