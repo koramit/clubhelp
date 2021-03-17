@@ -70,9 +70,8 @@ class TelegramWebhooksController extends Controller
         if ($user) {
             $user->disableNotificationChannel('telegram');
         } else {
-            Log::info('guest '.$this->update['my_chat_member']['chat']['username'].' unsubscrbed Telegram bot');
+            Log::info('guest '.$this->update['my_chat_member']['chat']['username'].' unsubscribed Telegram bot');
         }
-
     }
 
     protected function handleTextMessage()

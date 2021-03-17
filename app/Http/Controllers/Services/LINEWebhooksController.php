@@ -50,7 +50,7 @@ class LINEWebhooksController extends Controller
         $profile = $this->getProfile($event['source']['userId']);
 
         if (! $this->user) {
-            //bot_user_not_found
+            Log::info('guest add LINE bot '.$event['source']['userId']);
             $this->replyUnauthorized($event['replyToken'], $profile['displayName']);
 
             return;
@@ -73,7 +73,7 @@ class LINEWebhooksController extends Controller
         if ($this->user) {
             $this->user->disableNotificationChannel('line');
         } else {
-            Log::info('guest '.$event['source']['userId'].' unsubscrbed LINE bot');
+            Log::info('guest '.$event['source']['userId'].' unsubscribed LINE bot');
         }
     }
 
