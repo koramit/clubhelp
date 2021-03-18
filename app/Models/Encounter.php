@@ -28,6 +28,11 @@ class Encounter extends Model
         return $this->belongsTo(Patient::class);
     }
 
+    public function users()
+    {
+        return $this->belongsToMany(User::class);
+    }
+
     public function getPatientAgeAtEncounterAttribute()
     {
         $ageInMonths = $this->encountered_at->diffInMonths($this->patient->dob);
@@ -46,5 +51,14 @@ class Encounter extends Model
         }
 
         return 'MO';
+    }
+
+    public function encounteredAtRelativeToNow()
+    {
+        if (! $this->encountered_at) {
+            return null;
+        }
+
+        return $this->encountered_at->longRelativeToNowDiffForHumans();
     }
 }

@@ -28,6 +28,7 @@ class CreateEncountersTableMigration extends Migration
             $table->primary(['encounter_id', 'user_id']);
             $table->foreignId('encounter_id')->constrained();
             $table->foreignId('user_id')->constrained();
+            $table->string('status', 30)->index();
             $table->timestamps();
         });
     }

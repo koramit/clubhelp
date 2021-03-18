@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Managers\SubscriptionManager;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
 
@@ -22,14 +26,30 @@ class EncounterSubscriptionsController extends Controller
             ['icon' => 'procedure', 'label' => 'Add IPD case (later... 😅)', 'action' => 'not-ready'],
         ]);
 
-        return Inertia::render('Encounters/Index');
+        return Inertia::render('Encounters/Index', ['cases' => Auth::user()->encounters]);
     }
 
     public function store()
     {
-        // if ()
-        // 1. check if new visit
-        // 2. check if already visit
-        // 3. check if already subscribed
+        /*
+         * Validtion Refactor later 😂
+        */
+        if (! Request::has('id') || ! Request::has('type')) {
+            Log::info('user '.Auth::user()->id.' send incomplete request');
+            abort(400);
+        }
+        if (Request::input('type') == 'opd' && ! Request::has('dateVisit')) {
+            Log::info(Auth::user()->id.' send incomplete request OPD no dateVisit');
+            abort(400);
+        }
+
+        $subscription = (new SubscriptionManager())->manage(Request::input('id'), Request::input('type'), Request::input('dateVisit', null));
+
+        if (! $subscription) {
+            Log::info('user '.Auth::user()->id.' add case with not exists patient ID '.Request::input('id'));
+            abort(404);
+        }
+
+        return Redirect::back();
     }
 }

@@ -24,6 +24,43 @@ class Patient extends Model
         return $this->hasMany(Encounter::class);
     }
 
+    public function lastAdmission()
+    {
+        return $this->belongsTo(Encounter::class, 'last_admission_id');
+    }
+
+    public function lastVisit()
+    {
+        return $this->belongsTo(Encounter::class, 'last_visit_id');
+    }
+
+    public function scopeWithLastVisit($query)
+    {
+        $query->addSelect([
+            'last_visit_id' => Encounter::select('id')
+                        ->where('meta->type', 'visit')
+                        ->whereColumn('patient_id', 'patients.id')
+                        ->limit(1)
+                        ->latest('encountered_at'),
+        ])->with('lastVisit');
+    }
+
+    public function scopeWithLastAdmission($query)
+    {
+        $query->addSelect([
+            'last_admission_id' => Encounter::select('id')
+                        ->where('meta->type', 'admission')
+                        ->whereColumn('patient_id', 'patients.id')
+                        ->limit(1)
+                        ->latest('encountered_at'),
+        ])->with('lastAdmission');
+    }
+
+    public function scopeWithLastEncounters($query)
+    {
+        $query->withLastVisit()->withLastAdmission();
+    }
+
     /**
      * Set field 'hn'.
      *
@@ -78,7 +115,7 @@ class Patient extends Model
         ]);
     }
 
-    public function getAgeInYesrsAttribute()
+    public function getAgeInYearsAttribute()
     {
         if (! $this->dob) {
             return null;

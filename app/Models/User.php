@@ -42,6 +42,19 @@ class User extends Authenticatable
         'next_activation_at' => 'datetime',
     ];
 
+    public function encounters()
+    {
+        return $this->belongsToMany(Encounter::class)
+                    ->as('subscription')
+                    ->withPivot('status')
+                    ->withTimestamps();
+    }
+
+    public function getTimezoneAttribute()
+    {
+        return 'asia/bangkok';
+    }
+
     public function needQuarantine()
     {
         if (! $this->getNotificationChannel()) {

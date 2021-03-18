@@ -3,7 +3,6 @@
         <modal
             ref="modal"
             width-mode="form-cols-1"
-            @closed="reset"
         >
             <template #header>
                 <div class="font-semibold text-thick-theme-light">
@@ -87,34 +86,23 @@
             </template>
             <template #footer>
                 <div
-                    class=" overflow-y-hidden transition-all duration-1000 ease-linear"
+                    class=" overflow-y-hidden transition-all duration-300 ease-linear"
                     :class="{'max-h-0': !patient.hn, 'max-h-32': patient.hn}"
                 >
-                    <div class="flex justify-end items-center">
+                    <form-datetime
+                        label="date visit"
+                        name="date_visit"
+                        v-model="patient.date_visit"
+                    />
+                    <div class="flex justify-end items-center mt-2">
                         <button
                             class="btn btn-dark w-1/2"
-                            @click="createNewCase"
+                            @click="confirm"
                             :disabled="!patient.hn"
                         >
-                            New Visit
+                            CONFIRM
                         </button>
                     </div>
-                <!-- <div class="grid grid-cols-2 gap-2">
-                    <button
-                        class="btn btn-dark"
-                        @click="createNewCase"
-                        :disabled="!patient.hn"
-                    >
-                        Review
-                    </button>
-                    <button
-                        class="btn btn-dark"
-                        @click="createNewCase"
-                        :disabled="!patient.hn"
-                    >
-                        New Visit
-                    </button>
-                </div> -->
                 </div>
             </template>
         </modal>
@@ -124,10 +112,12 @@
 <script>
 import Modal from '@/Components/Helpers/Modal';
 import FormInput from '@/Components/Controls/FormInput';
+import FormDatetime from '@/Components/Controls/FormDatetime';
 import SpinnerButton from '@/Components/Controls/SpinnerButton';
 import axios from 'axios';
 export default {
-    components: { Modal, FormInput, SpinnerButton },
+    components: { Modal, FormInput, FormDatetime, SpinnerButton },
+    emits: ['confirmed'],
     data () {
         return {
             hn: '',
@@ -137,6 +127,7 @@ export default {
                 name: '',
                 gender: '',
                 age: '',
+                date_visit: '',
             },
             errors: {
                 hn: ''
@@ -158,19 +149,26 @@ export default {
             axios.post(`${this.$page.props.app.baseUrl}/search-patient/${this.hn}`)
                 .then(response => {
                     if (response.data.found) {
-                        this.patient = {...response.data};
+                        this.patient.id = response.data.id;
+                        this.patient.hn = response.data.hn;
+                        this.patient.name = response.data.name;
+                        this.patient.gender = response.data.gender;
+                        this.patient.age = response.data.age;
+                        this.patient.admission = response.data.admission;
                     } else {
                         this.errors.hn = response.data.message;
                     }
-                }).catch((error) => {
-                    console.log(error);
+                }).catch(() => {
                     this.errors.hn = 'Service unavailable at the moment, please try again.';
                 }).finally(() => this.busy = false);
         },
-        reset () {
-
+        confirm () {
+            this.$emit('confirmed', this.patient);
         },
         open () {
+            this.hn = '';
+            this.patient.hn = '';
+            this.patient.date_visit = new Date().toISOString().slice(0, 10);
             this.$refs.modal.open();
         },
         close () {
