@@ -4,6 +4,7 @@ namespace App\APIs;
 
 use App\Contracts\AuthenticationAPI;
 use App\Contracts\PatientAPI;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 
 class SmuggleAPI implements PatientAPI, AuthenticationAPI
@@ -67,8 +68,8 @@ class SmuggleAPI implements PatientAPI, AuthenticationAPI
             unset($data['patient']['reply_text']);
             $data['patient']['found'] = true;
 
-            $data['encountered_at'] = $data['datetime_admit'];
-            $data['dismissed_at'] = $data['datetime_dc'];
+            $data['encountered_at'] = $data['datetime_admit'] ? Carbon::parse($data['datetime_admit'], 'asia/bangkok')->tz('UTC') : null;
+            $data['dismissed_at'] = $data['datetime_dc'] ? Carbon::parse($data['datetime_dc'], 'asia/bangkok')->tz('UTC') : null;
             unset($data['datetime_admit']);
             unset($data['datetime_dc']);
 
