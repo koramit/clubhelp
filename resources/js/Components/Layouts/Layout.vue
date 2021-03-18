@@ -94,7 +94,7 @@
                         </button>
                         <!-- username and menu -->
                         <div
-                            class="flex flex-col text-center justify-center"
+                            class="flex flex-col text-center"
                             @click="mobileMenuVisible = false"
                         >
                             <span class="inline-block py-1 text-white">{{ $page.props.user.name }}</span>
@@ -113,6 +113,18 @@
                             >
                                 Logout
                             </inertia-link>
+                            <div class="flex justify-center mt-2">
+                                <div
+                                    class="w-8 h-8 rounded-full overflow-hidden border-bitter-theme-light border-2"
+                                    v-if="!avatarSrcError"
+                                >
+                                    <img
+                                        :src="`${$page.props.user.avatar}`"
+                                        alt="C"
+                                        @error="avatarSrcError = true"
+                                    >
+                                </div>
+                            </div>
                         </div>
                         <hr class="my-4">
                         <main-menu
@@ -160,7 +172,8 @@ export default {
     },
     data () {
         return {
-            mobileMenuVisible: false
+            mobileMenuVisible: false,
+            avatarSrcError: false
         };
     },
     setup () {
@@ -189,12 +202,10 @@ export default {
         },
         actionClicked (action) {
             this.mobileMenuVisible = false;
-            // this.$nextTick(() => {
-            //     this.doubleRequestAnimationFrame(() => this.eventBus.emit('action-clicked', action));
-            // });
 
             setTimeout(() => {
-                this.doubleRequestAnimationFrame(() => this.eventBus.emit('action-clicked', action));
+                // this.doubleRequestAnimationFrame(() => this.eventBus.emit('action-clicked', action));
+                this.eventBus.emit('action-clicked', action);
             }, 300); // equal to animate duration
         },
         doubleRequestAnimationFrame (callback) {
