@@ -70,6 +70,9 @@ class User extends Authenticatable
 
     public function getNotificationChannel()
     {
+        if (! isset($this->profile)) {
+            return null; // for route notification
+        }
         $channels = $this->profile['notification_channels'];
         if ($channels === [] ||
             ! $channels[$channels['provider']]['active'] // user unfollowed
@@ -111,12 +114,7 @@ class User extends Authenticatable
      */
     public function routeNotificationForLine($notification)
     {
-        $channel = $this->getNotificationChannel();
-        if (! $channel || $this->prefers_notification_channel !== 'line') {
-            return null;
-        }
-
-        return $this->profile['notification_channels']['line']['id'];
+        return $this->getNotificationRecipient('telegram');
     }
 
     /**
@@ -127,12 +125,17 @@ class User extends Authenticatable
      */
     public function routeNotificationForTelegram($notification)
     {
+        return $this->getNotificationRecipient('telegram');
+    }
+
+    public function getNotificationRecipient($provider)
+    {
         $channel = $this->getNotificationChannel();
-        if (! $channel || $this->prefers_notification_channel !== 'telegram') {
+        if (! $channel || $this->prefers_notification_channel !== $provider) {
             return null;
         }
 
-        return $this->profile['notification_channels']['telegram']['id'];
+        return $this->profile['notification_channels'][$provider]['id'];
     }
 
     public function reactivate($days)

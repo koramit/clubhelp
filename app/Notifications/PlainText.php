@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Channels\LineChannel;
 use App\Channels\TelegramChannel;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
@@ -32,7 +33,7 @@ class PlainText extends Notification
     public function via($notifiable)
     {
         // notification will send to all channels in return array
-        if (! $notifiable) {
+        if (! $notifiable instanceof User) {
             return [LineChannel::class, TelegramChannel::class];
         }
 
@@ -49,7 +50,7 @@ class PlainText extends Notification
     {
         // recipient + formatted message compatible with channel
         return [
-            'to' => isset($notifiable->profile) ? $notifiable->profile['notification_channels']['line']['id'] : null,
+            'to' => ($notifiable instanceof User) ? $notifiable->getNotificationRecipient('line') : null,
             'messages' => [[
                 'type' => 'text',
                 'text' => $this->message,
@@ -61,7 +62,7 @@ class PlainText extends Notification
     {
         // recipient + formatted message compatible with channel
         return [
-            'chat_id' => isset($notifiable->profile) ? $notifiable->profile['notification_channels']['telegram']['id'] : null,
+            'chat_id' => isset($notifiable->profile) ? $notifiable->getNotificationRecipient('telegram') : null,
             'text' => $this->message,
         ];
     }
