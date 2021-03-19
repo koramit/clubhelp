@@ -27,9 +27,6 @@ class TelegramChannel
         }
 
         // now support plain text only
-        return Http::post('https://api.telegram.org/bot'.config('services.telegram.bot_token').'/sendMessage', [
-            'chat_id' => $payload['chat_id'],
-            'text' => $payload['text'],
-        ]);
+        return Http::post(config('services.telegram.base_endpoint').'sendMessage', $payload);
     }
 }

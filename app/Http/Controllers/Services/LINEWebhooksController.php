@@ -20,7 +20,9 @@ class LINEWebhooksController extends Controller
      */
     public function __invoke()
     {
-        $this->client = Http::withToken(config('services.line.bot_token'));
+        $this->baseEndpoint = config('services.line.base_token');
+
+        $this->client = Http::withToken(config('services.line.bot_endpoint'));
 
         if (! Request::has('events')) { // this should never happend
             Log::error('LINE bad response');
@@ -92,7 +94,7 @@ class LINEWebhooksController extends Controller
 
     protected function replyMessage($replyToken, $messages)
     {
-        $this->client->post('https://api.line.me/v2/bot/message/reply', [
+        $this->client->post($this->baseEndpoint.'message/reply', [
             'replyToken' => $replyToken,
             'messages' => $messages,
         ]);
@@ -100,7 +102,7 @@ class LINEWebhooksController extends Controller
 
     protected function pushMessage($userId, $messages)
     {
-        $this->client->post('https://api.line.me/v2/bot/message/push', [
+        $this->client->post($this->baseEndpoint.'message/push', [
             'to' => $userId,
             'messages' => $messages,
         ]);
@@ -108,7 +110,7 @@ class LINEWebhooksController extends Controller
 
     protected function getProfile($userId)
     {
-        $response = $this->client->get('https://api.line.me/v2/bot/profile/'.$userId);
+        $response = $this->client->get($this->baseEndpoint.'profile/'.$userId);
 
         return $response->json();
     }

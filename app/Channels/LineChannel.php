@@ -27,9 +27,6 @@ class LineChannel
         }
 
         return Http::withToken(config('services.line.bot_token')) // now support plain text only
-                   ->post('https://api.line.me/v2/bot/message/push', [
-                        'to' => $payload['to'],
-                        'messages' => $payload['messages'],
-                   ]);
+                   ->post(config('services.line.base_endpoint').'message/push', $payload);
     }
 }

@@ -20,7 +20,7 @@ class TelegramWebhooksController extends Controller
             abort(404);
         }
 
-        $this->baseEndpoint = 'https://api.telegram.org/bot'.config('services.telegram.bot_token').'/';
+        $this->baseEndpoint = config('services.telegram.base_endpoint');
 
         $this->update = Request::all();
 

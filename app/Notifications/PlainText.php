@@ -50,7 +50,9 @@ class PlainText extends Notification
     {
         // recipient + formatted message compatible with channel
         return [
-            'to' => ($notifiable instanceof User) ? $notifiable->getNotificationRecipient('line') : null,
+            'to' => ($notifiable instanceof User) ?
+                        $notifiable->getNotificationRecipient('line') :
+                        null,
             'messages' => [[
                 'type' => 'text',
                 'text' => $this->message,
@@ -62,7 +64,9 @@ class PlainText extends Notification
     {
         // recipient + formatted message compatible with channel
         return [
-            'chat_id' => isset($notifiable->profile) ? $notifiable->getNotificationRecipient('telegram') : null,
+            'chat_id' => ($notifiable instanceof User) ?
+                            $notifiable->getNotificationRecipient('telegram') :
+                            null,
             'text' => $this->message,
         ];
     }
