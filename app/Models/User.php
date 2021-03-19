@@ -103,9 +103,46 @@ class User extends Authenticatable
         Log::info('user '.$this->name.' disabled '.$provider.' notification');
     }
 
+    /**
+     * Route notifications for the Line channel.
+     *
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return string
+     */
+    public function routeNotificationForLine($notification)
+    {
+        $channel = $this->getNotificationChannel();
+        if (! $channel || $this->prefers_notification_channel !== 'line') {
+            return null;
+        }
+
+        return $this->profile['notification_channels']['line']['id'];
+    }
+
+    /**
+     * Route notifications for the Telegram channel.
+     *
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return string
+     */
+    public function routeNotificationForTelegram($notification)
+    {
+        $channel = $this->getNotificationChannel();
+        if (! $channel || $this->prefers_notification_channel !== 'telegram') {
+            return null;
+        }
+
+        return $this->profile['notification_channels']['telegram']['id'];
+    }
+
     public function reactivate($days)
     {
         $this->next_activation_at = $this->next_activation_at->addDays($days);
         $this->save();
+    }
+
+    public function getPrefersNotificationChannelAttribute()
+    {
+        return isset($this->profile['notification_channels']['provider']) ? $this->profile['notification_channels']['provider'] : null;
     }
 }
