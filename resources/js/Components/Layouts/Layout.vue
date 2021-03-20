@@ -24,6 +24,7 @@
                     >
                         <svg
                             class="w-6 h-6"
+                            :class="{ 'animate-spin': typing }"
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 512 512"
                         ><path
@@ -160,7 +161,8 @@ import Dropdown from '@/Components/Helpers/Dropdown';
 import Icon from '@/Components/Helpers/Icon';
 import MainMenu from '@/Components/Helpers/MainMenu';
 import ActionMenu from '@/Components/Helpers/ActionMenu';
-import { onMounted } from 'vue';
+// import { onMounted } from 'vue';
+import axios from 'axios';
 export default {
     components: { Dropdown, Icon, MainMenu, ActionMenu },
     watch: {
@@ -173,10 +175,11 @@ export default {
     data () {
         return {
             mobileMenuVisible: false,
-            avatarSrcError: false
+            avatarSrcError: false,
+            typing: false,
         };
     },
-    setup () {
+    created () {
         var lastTimeCheckSessionTimeout = Date.now();
         const endpoint = document.querySelector('meta[name=base-url]').content + '/session-timeout';
         const sessionLifetimeSeconds = parseInt(document.querySelector('meta[name=session-lifetime-seconds]').content);
@@ -188,14 +191,42 @@ export default {
                     .catch(() => location.reload());
             }
         });
-
-        onMounted (() => {
+        this.eventBus.on('typing', () => {
+            if (! this.typing) {
+                this.typing = true;
+                console.log('roll the cookie');
+            }
+        });
+        this.eventBus.on('typing-stopped', () => this.typing = false);
+    },
+    mounted () {
+        this.$nextTick(() => {
             const pageLoadingIndicator = document.getElementById('page-loading-indicator');
             if (pageLoadingIndicator) {
                 pageLoadingIndicator.remove();
             }
         });
     },
+    // setup () {
+    //     var lastTimeCheckSessionTimeout = Date.now();
+    //     const endpoint = document.querySelector('meta[name=base-url]').content + '/session-timeout';
+    //     const sessionLifetimeSeconds = parseInt(document.querySelector('meta[name=session-lifetime-seconds]').content);
+    //     window.addEventListener('focus', () => {
+    //         let timeDiff = Date.now() - lastTimeCheckSessionTimeout;
+    //         if ( (timeDiff) > (sessionLifetimeSeconds) ) {
+    //             axios.post(endpoint)
+    //                 .then(() => lastTimeCheckSessionTimeout = Date.now())
+    //                 .catch(() => location.reload());
+    //         }
+    //     });
+
+    //     onMounted (() => {
+    //         const pageLoadingIndicator = document.getElementById('page-loading-indicator');
+    //         if (pageLoadingIndicator) {
+    //             pageLoadingIndicator.remove();
+    //         }
+    //     });
+    // },
     methods: {
         url() {
             return location.pathname.substr(1);
@@ -204,15 +235,9 @@ export default {
             this.mobileMenuVisible = false;
 
             setTimeout(() => {
-                // this.doubleRequestAnimationFrame(() => this.eventBus.emit('action-clicked', action));
                 this.eventBus.emit('action-clicked', action);
             }, 300); // equal to animate duration
-        },
-        doubleRequestAnimationFrame (callback) {
-            requestAnimationFrame(() => {
-                requestAnimationFrame(callback);
-            });
-        },
+        }
     }
 };
 </script>

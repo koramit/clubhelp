@@ -8,7 +8,8 @@
     {{-- minutes to microseconds --}}
     <meta name="session-lifetime-seconds"
         content="{{ Config::get('session.lifetime') * 60000 }}" />
-    <link href="https://fonts.googleapis.com/css2?family=Fascinate+Inline&family=Mali:wght@300;600&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fascinate+Inline&family=Mali:ital,wght@0,300;0,600;1,300;1,600&display=swap"
         rel="stylesheet">
     <link href="{{ mix('/css/app.css') }}" rel="stylesheet" />
     <script src="{{ mix('/js/app.js') }}" defer></script>
