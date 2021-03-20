@@ -20,6 +20,7 @@ class PatientDataAPIController extends Controller
         return [
             'found' => true,
             'id' => $patient->id,
+            'slug' => $patient->slug,
             'hn' => $hn,
             'name' => $patient->full_name,
             'gender' => $patient->profile['gender'],

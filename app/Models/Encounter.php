@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class Encounter extends Model
 {
@@ -51,6 +52,26 @@ class Encounter extends Model
         }
 
         return 'MO';
+    }
+
+    public function getPageTitleAttribute()
+    {
+        return implode(' ', [
+            'HN',
+            $this->patient->hn,
+            $this->patient->profile['first_name'],
+            ucwords($this->meta['type']),
+            $this->encountered_at->tz(Auth::user() ? Auth::user()->timezone : 'UTC')->format('d M Y'),
+        ]);
+    }
+
+    public function getPageTitleShortAttribute()
+    {
+        return implode(' ', [
+            'HN',
+            $this->patient->hn,
+            $this->patient->profile['first_name'],
+        ]);
     }
 
     public function encounteredAtRelativeToNow()

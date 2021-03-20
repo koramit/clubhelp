@@ -16,12 +16,18 @@ class Patient extends Model
 
     protected $fillable = [
         'hn',
+        'slug',
         'profile',
     ];
 
     public function encounters()
     {
         return $this->hasMany(Encounter::class);
+    }
+
+    public function lastStay()
+    {
+        return $this->belongsTo(Encounter::class, 'last_stay_id');
     }
 
     public function lastAdmission()
@@ -34,15 +40,15 @@ class Patient extends Model
         return $this->belongsTo(Encounter::class, 'last_visit_id');
     }
 
-    public function scopeWithLastVisit($query)
+    public function scopeWithLastStay($query)
     {
         $query->addSelect([
-            'last_visit_id' => Encounter::select('id')
-                        ->where('meta->type', 'visit')
+            'last_stay_id' => Encounter::select('id')
+                        ->where('meta->type', 'stay')
                         ->whereColumn('patient_id', 'patients.id')
                         ->limit(1)
                         ->latest('encountered_at'),
-        ])->with('lastVisit');
+        ])->with('lastStay');
     }
 
     public function scopeWithLastAdmission($query)
@@ -56,9 +62,27 @@ class Patient extends Model
         ])->with('lastAdmission');
     }
 
+    public function scopeWithLastVisit($query)
+    {
+        $query->addSelect([
+            'last_visit_id' => Encounter::select('id')
+                        ->where('meta->type', 'visit')
+                        ->whereColumn('patient_id', 'patients.id')
+                        ->limit(1)
+                        ->latest('encountered_at'),
+        ])->with('lastVisit');
+    }
+
     public function scopeWithLastEncounters($query)
     {
-        $query->withLastVisit()->withLastAdmission();
+        $query->withLastStay()->withLastAdmission()->withLastVisit();
+    }
+
+    public function scopeWithEncountersByType($query, $type)
+    {
+        $query->with(['encounters' => function ($query) use ($type) {
+            $query->where('meta->type', $type);
+        }]);
     }
 
     /**

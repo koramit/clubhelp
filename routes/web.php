@@ -3,9 +3,11 @@
 use App\Http\Controllers\Auth\ActivatedUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\EncounterSubscriptionsController;
+use App\Http\Controllers\EncountersController;
+use App\Http\Controllers\SubscriptionsController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\PatientDataAPIController;
+use App\Http\Controllers\PatientEncountersController;
 use App\Http\Controllers\QuarantinedUserController;
 use App\Http\Controllers\Services\LINEWebhooksController;
 use App\Http\Controllers\Services\TelegramWebhooksController;
@@ -39,5 +41,8 @@ Route::post('/webhooks/telegram/{token}', TelegramWebhooksController::class);
 Route::middleware('qualify')->post('/search-patient/{hn}', PatientDataAPIController::class);
 
 // Features
-Route::middleware('qualify')->get('/cases', [EncounterSubscriptionsController::class, 'index'])->name('cases');
-Route::middleware('qualify')->post('/cases', [EncounterSubscriptionsController::class, 'store']);
+Route::middleware('qualify')->get('/cases', [SubscriptionsController::class, 'index'])->name('cases');
+Route::middleware('qualify')->post('/cases', [SubscriptionsController::class, 'store']);
+Route::middleware('qualify')->get('/encounters/{encounter:slug}', [EncountersController::class, 'show'])->name('case.show');
+Route::middleware('qualify')->post('/encounters', [EncountersController::class, 'store']);
+Route::middleware('qualify')->get('/patients/{patient:slug}/cases', [PatientEncountersController::class, 'index'])->name('patient.cases');

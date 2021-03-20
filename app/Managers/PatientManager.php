@@ -4,6 +4,7 @@ namespace App\Managers;
 
 use App\Models\Patient;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class PatientManager
 {
@@ -17,7 +18,7 @@ class PatientManager
                 return $data;
             }
 
-            $patient = Patient::create(['hn' => $hn, 'profile' => $this->mapProfile($data)]);
+            $patient = Patient::create(['hn' => $hn, 'slug' => Str::uuid()->toString(), 'profile' => $this->mapProfile($data)]);
             if ($data['admission']['found']) {
                 (new AdmissionManager())->maintain($data['admission'], $patient);
             }

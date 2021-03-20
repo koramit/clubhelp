@@ -15,6 +15,7 @@ class CreateEncountersTableMigration extends Migration
     {
         Schema::create('encounters', function (Blueprint $table) {
             $table->id();
+            $table->uuid('slug');
             $table->string('key_no', 20)->index();
             $table->foreignId('patient_id')->constrained();
             $table->json('meta')->nullable();

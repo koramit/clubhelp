@@ -3,6 +3,7 @@
 namespace App\Managers;
 
 use App\Models\Encounter;
+use Illuminate\Support\Str;
 
 class AdmissionManager
 {
@@ -19,10 +20,11 @@ class AdmissionManager
             $meta['discharge_status'] = $admission['discharge_status_name'] ?? null;
             $admissionRow->update([
                 'dismissed_at' => $admission['dismissed_at'],
-                'meta' => $meta
+                'meta' => $meta,
             ]);
         } else {
             $admissionRow = $patient->encounters()->create([
+                                'slug' => Str::uuid()->toString(),
                                 'key_no' => $admission['an'],
                                 'meta' => [
                                     'type' => 'admission',
