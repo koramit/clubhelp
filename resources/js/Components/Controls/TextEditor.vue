@@ -9,6 +9,7 @@
         <trix-editor
             :input="name"
             @trix-change="contentChange"
+            ref="trix"
         />
     </div>
 </template>
@@ -52,6 +53,9 @@ export default {
         },
         debounceSave () {
             this.$emit('autosave');
+        },
+        clear () {
+            this.$refs.trix.value = '';
         }
     }
 };

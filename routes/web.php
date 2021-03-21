@@ -4,13 +4,14 @@ use App\Http\Controllers\Auth\ActivatedUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\EncountersController;
-use App\Http\Controllers\SubscriptionsController;
+use App\Http\Controllers\NotesController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\PatientDataAPIController;
 use App\Http\Controllers\PatientEncountersController;
 use App\Http\Controllers\QuarantinedUserController;
 use App\Http\Controllers\Services\LINEWebhooksController;
 use App\Http\Controllers\Services\TelegramWebhooksController;
+use App\Http\Controllers\SubscriptionsController;
 use Illuminate\Support\Facades\Route;
 
 // Pages
@@ -46,3 +47,4 @@ Route::middleware('qualify')->post('/cases', [SubscriptionsController::class, 's
 Route::middleware('qualify')->get('/encounters/{encounter:slug}', [EncountersController::class, 'show'])->name('case.show');
 Route::middleware('qualify')->post('/encounters', [EncountersController::class, 'store']);
 Route::middleware('qualify')->get('/patients/{patient:slug}/cases', [PatientEncountersController::class, 'index'])->name('patient.cases');
+Route::middleware('qualify')->post('/encounters/{encounter}/notes', [NotesController::class, 'store']);

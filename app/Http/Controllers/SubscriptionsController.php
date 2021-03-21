@@ -26,7 +26,25 @@ class SubscriptionsController extends Controller
             ['icon' => 'procedure', 'label' => 'Add IPD case (later... 😅)', 'action' => 'not-ready'],
         ]);
 
-        return Inertia::render('Encounters/User/Index', ['encounters' => Auth::user()->encounters]);
+        $encounters = (Auth::user()->load([
+            'encounters' => fn ($q) => $q->select(['id', 'patient_id', 'slug', 'meta'])
+                                         ->with('patient'),
+            ])
+        )->encounters;
+        $encounters = $encounters->transform(fn ($e) => [
+            'id' => $e->id,
+            'slug' => $e->slug,
+            'type' => ucwords($e->meta['type']),
+            'patient' => [
+                'hn' => $e->patient->hn,
+                'fullname' => $e->patient->fullname,
+                'first_name' => $e->patient->profile['first_name'],
+                'gender' => $e->patient->profile['gender'],
+            ],
+        ]);
+        // $encounters = (Auth::user()->load('encounters'))->encounters;
+
+        return Inertia::render('Encounters/User/Index', ['encounters' => $encounters]);
     }
 
     public function store()

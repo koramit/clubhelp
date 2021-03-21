@@ -11,7 +11,7 @@
             :key="encounter.id"
             :href="`${$page.props.app.baseUrl}/encounters/${encounter.slug}`"
         >
-            {{ encounter.key_no }}
+            {{ encounter.patient.first_name }}
         </inertia-link>
         <button @click="$refs.searchPatientModal.open()">
             add stay
