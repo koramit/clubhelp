@@ -20,9 +20,9 @@ class LINEWebhooksController extends Controller
      */
     public function __invoke()
     {
-        $this->baseEndpoint = config('services.line.base_token');
+        $this->baseEndpoint = config('services.line.base_endpoint');
 
-        $this->client = Http::withToken(config('services.line.bot_endpoint'));
+        $this->client = Http::withToken(config('services.line.bot_token'));
 
         if (! Request::has('events')) { // this should never happend
             Log::error('LINE bad response');
