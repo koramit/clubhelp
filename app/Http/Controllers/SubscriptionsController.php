@@ -27,14 +27,15 @@ class SubscriptionsController extends Controller
         ]);
 
         $encounters = (Auth::user()->load([
-            'encounters' => fn ($q) => $q->select(['id', 'patient_id', 'slug', 'meta'])
-                                         ->with('patient'),
+            'encounters' => fn ($q) => $q->select(['id', 'patient_id', 'slug', 'meta', 'encountered_at'])
+                                         ->with('patient'), // ->wherePivotIn('status', ['unlisted'])
             ])
         )->encounters;
         $encounters = $encounters->transform(fn ($e) => [
             'id' => $e->id,
             'slug' => $e->slug,
             'type' => ucwords($e->meta['type']),
+            'encountered_at' => $e->encountered_at->tz(Auth::user()->timezone)->format('d M Y'),
             'patient' => [
                 'hn' => $e->patient->hn,
                 'fullname' => $e->patient->fullname,

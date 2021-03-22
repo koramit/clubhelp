@@ -28,6 +28,8 @@ class AdmissionManager
                                 'key_no' => $admission['an'],
                                 'meta' => [
                                     'type' => 'admission',
+                                    'hn' => $patient->hn,
+                                    'patient_first_name' => $patient->profile['first_name'],
                                     'place_name' => $admission['ward_name'] ?? null,
                                     'place_name_short' => $admission['ward_name_short'] ?? null,
                                     'attending' => $admission['attending_name'] ?? null,

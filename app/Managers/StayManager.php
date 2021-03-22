@@ -28,6 +28,8 @@ class StayManager
             'key_no' => $keyNo,
             'meta' => [
                 'type' => 'stay',
+                'hn' => $patient->hn,
+                'patient_first_name' => $patient->profile['first_name'],
                 'creator' => $user->id,
             ],
             'encountered_at' => $dateVisit,

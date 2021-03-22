@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\ActivatedUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\EncounterNotesController;
 use App\Http\Controllers\EncountersController;
 use App\Http\Controllers\NotesController;
 use App\Http\Controllers\PagesController;
@@ -43,8 +44,8 @@ Route::middleware('qualify')->post('/search-patient/{hn}', PatientDataAPIControl
 
 // Features
 Route::middleware('qualify')->get('/cases', [SubscriptionsController::class, 'index'])->name('cases');
-Route::middleware('qualify')->post('/cases', [SubscriptionsController::class, 'store']);
-Route::middleware('qualify')->get('/encounters/{encounter:slug}', [EncountersController::class, 'show'])->name('case.show');
-Route::middleware('qualify')->post('/encounters', [EncountersController::class, 'store']);
+Route::middleware('qualify')->get('/cases/{encounter:slug}/notes', [EncounterNotesController::class, 'index'])->name('case.notes');
 Route::middleware('qualify')->get('/patients/{patient:slug}/cases', [PatientEncountersController::class, 'index'])->name('patient.cases');
-Route::middleware('qualify')->post('/encounters/{encounter}/notes', [NotesController::class, 'store']);
+Route::middleware('qualify')->post('/cases/{encounter}/notes', [NotesController::class, 'store']);
+Route::middleware('qualify')->post('/cases', [SubscriptionsController::class, 'store']);
+Route::middleware('qualify')->post('/encounters', [EncountersController::class, 'store']);

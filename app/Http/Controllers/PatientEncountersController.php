@@ -24,11 +24,11 @@ class PatientEncountersController extends Controller
                 } else {
                     abort(400);
                 }
-                // $patient = Patient::withEncountersByType($type)->find($patient->id);
-                // should subscribe and redirect to encounter show
-                $user->encounters()->syncWithoutDetaching([$case->id => ['status' => 'active']]);
+                $user->encounters()->syncWithoutDetaching([
+                    $case->id => ['status' => 'enlisted', 'as' => 'personal'],
+                ]);
 
-                return Redirect::route('case.show', [$case]);
+                return Redirect::route('case.notes', [$case]);
             }
         }
 

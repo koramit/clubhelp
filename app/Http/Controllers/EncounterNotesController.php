@@ -3,14 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Encounter;
-use App\Models\Patient;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
 
-class EncountersController extends Controller
+class EncounterNotesController extends Controller
 {
-    public function show(Encounter $encounter)
+    public function index(Encounter $encounter)
     {
         Request::session()->flash('main-menu-links', [
             ['icon' => 'clipboard-list', 'label' => 'My Cases', 'route' => 'cases'],
@@ -35,17 +34,12 @@ class EncountersController extends Controller
         ]);
 
         $encounter = [
+            'id' => $encounter->id,
             'meta' => $encounter->meta,
             'encountered_at' => $encounter->encountered_at->tz(Auth::user()->timezone)->format('d M Y'),
             'notes' => $encounter->notes,
         ];
 
         return Inertia::render('Encounters/Show', ['encounter' => $encounter]);
-    }
-
-    public function store()
-    {
-        // $patient = Patient::withEncountersByType(Request::input('type'))->find(Request::input('patient_id'));
-        // $subscription = (new SubscriptionManager())->manage($patient, Request::input('type'), Request::input('dateVisit', null));
     }
 }

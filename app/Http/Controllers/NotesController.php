@@ -12,7 +12,13 @@ class NotesController extends Controller
 {
     public function store(Encounter $encounter)
     {
-        $note = (new NoteManager())->create($encounter, Auth::user(), Request::input('content'), Request::input('type'));
+        // check type note|consult|service
+        if (count(Request::input('consult', [])) > 0) {
+            $type = 'consult';
+        } else {
+            $type = 'note';
+        }
+        $note = (new NoteManager())->create($encounter, Auth::user(), Request::input('content'), $type);
 
         return Redirect::back();
     }

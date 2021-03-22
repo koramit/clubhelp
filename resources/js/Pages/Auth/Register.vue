@@ -11,10 +11,10 @@
             </div>
         </div>
         <div class="mt-4 px-4 py-8 w-80 bg-white rounded shadow transform -translate-y-16">
-            <div class="font-semibold text-xl mt-8 text-center">
+            <div class="font-fascinate-inline font-semibold text-thick-theme-light text-xl mt-8 text-center">
                 Register
             </div>
-            <small class="block text-center text-dark-theme-light">with {{ `${socialProfile.name}@${socialProfile.provider}` }}</small>
+            <small class="block text-center text-dark-theme-light">with {{ `${socialProfile.name}@` }}<span class="font-semibold">{{ socialProfile.provider.toUpperCase() }}</span></small>
             <div v-if="!profile.found">
                 <form-input
                     class="mt-8"

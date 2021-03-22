@@ -8,13 +8,17 @@ use Illuminate\Support\Str;
 
 class NoteManager
 {
-    public function create(Encounter $encounter, User $user, $content, $type = 'note')
+    public function create(Encounter $encounter, User $user, $content, $type)
     {
-        return $encounter->notes()->create([
+        $note = $encounter->notes()->create([
             'slug' => Str::uuid()->toString(),
             'user_id' => $user->id,
             'content' => $content,
-            'type' => $type ?? 'note',
+            'type' => $type,
         ]);
+
+        // create event
+
+        return $note;
     }
 }

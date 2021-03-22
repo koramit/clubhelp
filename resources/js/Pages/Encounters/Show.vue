@@ -82,10 +82,14 @@ export default {
         },
         addNote () {
             this.$inertia.post(
-                `${this.$page.props.app.baseUrl}/encounters/${this.encounter.id}/notes`,
-                { content: this.content },
+                `${this.$page.props.app.baseUrl}/cases/${this.encounter.id}/notes`,
+                { content: this.content, consult: this.tags },
                 {
-                    onSuccess: () => this.$refs.textEditor.clear(),
+                    onSuccess: () => {
+                        this.$refs.textEditor.clear();
+                        this.tags = [];
+                        this.showDivisions = false;
+                    },
                 }
             );
         },

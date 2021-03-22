@@ -5,14 +5,19 @@
             ref="searchPatientModal"
         />
         <h1>around 🤲🏻 about 🙌🏻 arrange</h1>
-        <inertia-link
-            class="block"
+        <div
+            class="mt-2 p-2 rounded shadow bg-white"
             v-for="encounter in encounters"
             :key="encounter.id"
-            :href="`${$page.props.app.baseUrl}/encounters/${encounter.slug}`"
         >
-            {{ encounter.patient.first_name }}
-        </inertia-link>
+            <inertia-link
+                class="block text-thick-theme-light font-semibold"
+                :href="`${$page.props.app.baseUrl}/cases/${encounter.slug}/notes`"
+            >
+                {{ `${encounter.patient.first_name} HN ${encounter.patient.hn}` }}
+            </inertia-link>
+            <span class="text-sm">{{ `${encounter.type}@${encounter.encountered_at}` }}</span>
+        </div>
         <button @click="$refs.searchPatientModal.open()">
             add stay
         </button>
