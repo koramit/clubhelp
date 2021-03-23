@@ -5,3 +5,12 @@
 .font-fascinate-inline {
     font-family: 'Fascinate Inline', cursive;
 }
+
+div.trix-text strong {
+    font-weight: 600;
+}
+
+div.trix-text h1 {
+    font-size: 2rem;
+    font-weight: 600;
+}

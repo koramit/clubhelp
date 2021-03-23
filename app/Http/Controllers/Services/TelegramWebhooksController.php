@@ -20,7 +20,7 @@ class TelegramWebhooksController extends Controller
             abort(404);
         }
 
-        $this->baseEndpoint = 'https://api.telegram.org/bot'.config('services.telegram.bot_token').'/';
+        $this->baseEndpoint = config('services.telegram.base_endpoint');
 
         $this->update = Request::all();
 
@@ -53,7 +53,7 @@ class TelegramWebhooksController extends Controller
             $this->user->setNotificationChannel('telegram', $this->update['message']['chat']['id']);
             Http::post("{$this->baseEndpoint}sendMessage", [
                 'chat_id' => $this->update['message']['chat']['id'],
-                'text' => str_replace('PLACEHOLDER', $this->user->profile['full_name'], config('messages.bot_greeting')),
+                'text' => __('reply_messages.bot.greeting', ['PLACEHOLDER' => $this->user->profile['full_name']]),
             ]);
         }
     }
@@ -70,9 +70,8 @@ class TelegramWebhooksController extends Controller
         if ($user) {
             $user->disableNotificationChannel('telegram');
         } else {
-            Log::info('guest '.$this->update['my_chat_member']['chat']['username'].' unsubscrbed Telegram bot');
+            Log::info('guest '.$this->update['my_chat_member']['chat']['username'].' unsubscribed Telegram bot');
         }
-
     }
 
     protected function handleTextMessage()
@@ -93,7 +92,7 @@ class TelegramWebhooksController extends Controller
     {
         Http::post("{$this->baseEndpoint}sendMessage", [
             'chat_id' => $this->update['message']['chat']['id'],
-            'text' => str_replace('PLACEHOLDER', $this->update['message']['chat']['username'], config('messages.bot_user_not_registred'))."\n\n เมื่อทำการลงทะเบียนแล้วอย่าลืม stop และ restart bot ด้วยน๊า 🤗",
+            'text' => __('reply_messages.bot.user_not_registered', ['PLACEHOLDER' => $this->update['message']['chat']['username'], 'STOP' => 'stop', 'RESTART' => 'restart']),
         ]);
     }
 }

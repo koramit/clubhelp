@@ -42,6 +42,19 @@ class User extends Authenticatable
         'next_activation_at' => 'datetime',
     ];
 
+    public function encounters()
+    {
+        return $this->belongsToMany(Encounter::class)
+                    ->as('subscription')
+                    ->withPivot('status', 'as', 'draft')
+                    ->withTimestamps();
+    }
+
+    public function getTimezoneAttribute()
+    {
+        return 'asia/bangkok';
+    }
+
     public function needQuarantine()
     {
         if (! $this->getNotificationChannel()) {
@@ -49,7 +62,7 @@ class User extends Authenticatable
         }
 
         if ($this->next_activation_at->isPast()) {
-            return 'activation';
+            return 'reactivation';
         }
 
         return false;
@@ -57,6 +70,9 @@ class User extends Authenticatable
 
     public function getNotificationChannel()
     {
+        if (! isset($this->profile)) {
+            return null; // for route notification
+        }
         $channels = $this->profile['notification_channels'];
         if ($channels === [] ||
             ! $channels[$channels['provider']]['active'] // user unfollowed
@@ -88,5 +104,68 @@ class User extends Authenticatable
         $this->profile = $profile;
         $this->save();
         Log::info('user '.$this->name.' disabled '.$provider.' notification');
+    }
+
+    /**
+     * Route notifications for the Line channel.
+     *
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return string
+     */
+    public function routeNotificationForLine($notification)
+    {
+        return $this->getNotificationRecipient('telegram');
+    }
+
+    /**
+     * Route notifications for the Telegram channel.
+     *
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return string
+     */
+    public function routeNotificationForTelegram($notification)
+    {
+        return $this->getNotificationRecipient('telegram');
+    }
+
+    /**
+     * Route notifications for the Log channel.
+     *
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return string
+     */
+    public function routeNotificationForLog($notification)
+    {
+        return $this->getNotificationRecipient('log');
+    }
+
+    public function getNotificationRecipient($provider)
+    {
+        $channel = $this->getNotificationChannel();
+        if (! $channel || $this->prefers_notification_channel !== $provider) {
+            return null;
+        }
+
+        return $this->profile['notification_channels'][$provider]['id'];
+    }
+
+    public function reactivate($days)
+    {
+        $this->next_activation_at = $this->next_activation_at->addDays($days);
+        $this->save();
+    }
+
+    public function getPrefersNotificationChannelAttribute()
+    {
+        return isset($this->profile['notification_channels']['provider']) ? $this->profile['notification_channels']['provider'] : null;
+    }
+
+    public function assignDivision($division)
+    {
+        $profile = $this->profile;
+        $profile['divisions'] = [$division];
+        $this->profile = $profile;
+
+        return $this->save();
     }
 }

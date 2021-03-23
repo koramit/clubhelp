@@ -24,6 +24,7 @@
                     >
                         <svg
                             class="w-6 h-6"
+                            :class="{ 'animate-spin': typing }"
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 512 512"
                         ><path
@@ -94,7 +95,7 @@
                         </button>
                         <!-- username and menu -->
                         <div
-                            class="flex flex-col text-center justify-center"
+                            class="flex flex-col text-center"
                             @click="mobileMenuVisible = false"
                         >
                             <span class="inline-block py-1 text-white">{{ $page.props.user.name }}</span>
@@ -113,12 +114,25 @@
                             >
                                 Logout
                             </inertia-link>
+                            <div class="flex justify-center mt-2">
+                                <div
+                                    class="w-8 h-8 rounded-full overflow-hidden border-bitter-theme-light border-2"
+                                    v-if="!avatarSrcError"
+                                >
+                                    <img
+                                        :src="`${$page.props.user.avatar}`"
+                                        alt="C"
+                                        @error="avatarSrcError = true"
+                                    >
+                                </div>
+                            </div>
                         </div>
                         <hr class="my-4">
                         <main-menu
                             @click="mobileMenuVisible = false"
                             :url="url()"
                         />
+                        <action-menu @action-clicked="actionClicked" />
                     </div>
                 </div>
             </div>
@@ -143,16 +157,14 @@
 </template>
 
 <script>
-import Dropdown from '@/Components/Helpers/Dropdown.vue';
-import Icon from '@/Components/Helpers/Icon.vue';
-import MainMenu from '@/Components/Helpers/MainMenu.vue';
-import { onMounted } from 'vue';
+import Dropdown from '@/Components/Helpers/Dropdown';
+import Icon from '@/Components/Helpers/Icon';
+import MainMenu from '@/Components/Helpers/MainMenu';
+import ActionMenu from '@/Components/Helpers/ActionMenu';
+// import { onMounted } from 'vue';
+import axios from 'axios';
 export default {
-    components: {
-        Dropdown,
-        Icon,
-        MainMenu
-    },
+    components: { Dropdown, Icon, MainMenu, ActionMenu },
     watch: {
         '$page.props.flash': {
             immediate: true,
@@ -162,10 +174,12 @@ export default {
     },
     data () {
         return {
-            mobileMenuVisible: false
+            mobileMenuVisible: false,
+            avatarSrcError: false,
+            typing: false,
         };
     },
-    setup () {
+    created () {
         var lastTimeCheckSessionTimeout = Date.now();
         const endpoint = document.querySelector('meta[name=base-url]').content + '/session-timeout';
         const sessionLifetimeSeconds = parseInt(document.querySelector('meta[name=session-lifetime-seconds]').content);
@@ -177,18 +191,53 @@ export default {
                     .catch(() => location.reload());
             }
         });
-
-        onMounted (() => {
+        this.eventBus.on('typing', () => {
+            if (! this.typing) {
+                this.typing = true;
+                console.log('roll the cookie');
+            }
+        });
+        this.eventBus.on('typing-stopped', () => this.typing = false);
+    },
+    mounted () {
+        this.$nextTick(() => {
             const pageLoadingIndicator = document.getElementById('page-loading-indicator');
             if (pageLoadingIndicator) {
                 pageLoadingIndicator.remove();
             }
         });
     },
+    // setup () {
+    //     var lastTimeCheckSessionTimeout = Date.now();
+    //     const endpoint = document.querySelector('meta[name=base-url]').content + '/session-timeout';
+    //     const sessionLifetimeSeconds = parseInt(document.querySelector('meta[name=session-lifetime-seconds]').content);
+    //     window.addEventListener('focus', () => {
+    //         let timeDiff = Date.now() - lastTimeCheckSessionTimeout;
+    //         if ( (timeDiff) > (sessionLifetimeSeconds) ) {
+    //             axios.post(endpoint)
+    //                 .then(() => lastTimeCheckSessionTimeout = Date.now())
+    //                 .catch(() => location.reload());
+    //         }
+    //     });
+
+    //     onMounted (() => {
+    //         const pageLoadingIndicator = document.getElementById('page-loading-indicator');
+    //         if (pageLoadingIndicator) {
+    //             pageLoadingIndicator.remove();
+    //         }
+    //     });
+    // },
     methods: {
         url() {
             return location.pathname.substr(1);
         },
+        actionClicked (action) {
+            this.mobileMenuVisible = false;
+
+            setTimeout(() => {
+                this.eventBus.emit('action-clicked', action);
+            }, 300); // equal to animate duration
+        }
     }
 };
 </script>

@@ -39,44 +39,19 @@ class HandleInertiaRequests extends Middleware
         return array_merge(parent::share($request), [
             'app' => [
                 'baseUrl' => url(''),
-                // 'photoPath' => config('app.PHOTO_PATH'),
-                // 'session_lifetime' => ((int) Config::get('session.lifetime') * 60), // in seconds
             ],
-            // 'title' => Session::get('page-title', 'super page'),
-            'flash' => function () use ($request) {
-                return [
-                    // 'success' => Session::get('success'),
-                    // 'error' => Session::get('error'),
-                    // 'data' => Session::get('data'),
-                    'title' => $request->session()->get('page-title', 'MISSING'),
-                ];
-            },
-            'user' => function () {
-                // if (! Auth::user()) {
-                //     return;
-                // }
-                // return [
-                //     'id' => Auth::id(),
-                //     'name' => Auth::user()->name,
-                //     'configs' => [
-                //         'hideRichTextTools' => true,
-                //     ],
-                //     'abilities' => Auth::user()->abilities(),
-                // ];
-                return [
-                    'id' => 1,
-                    'name' => 'username',
-                    'configs' => [
-                        // 'hideRichTextTools' => true,
-                    ],
-                    'mainMenuLinks' => [
-                        ['icon' => 'patient', 'label' => 'Patients', 'route' => 'prototypes/PatientsIndex'],
-                        ['icon' => 'clinic', 'label' => 'Clinics', 'route' => 'prototypes/ClinicsIndex'],
-                        ['icon' => 'procedure', 'label' => 'Procedures', 'route' => 'prototypes/ProceduresIndex'],
-                    ],
-                    // 'abilities' => Auth::user()->abilities(),
-                ];
-            },
+            'flash' => [
+                'title' => fn () => $request->session()->get('page-title', 'MISSING'),
+                'message' => fn () => $request->session()->get('message'),
+                'mainMenuLinks' => fn () => $request->session()->get('main-menu-links', []),
+                'actionMenu' => fn () => $request->session()->get('action-menu', []),
+            ],
+            'user' => fn () => $request->user()
+                ? [
+                    'id' => $request->user()->id,
+                    'name' => $request->user()->name,
+                    'avatar' => $request->user()->profile['social']['avatar'],
+                ] : null,
         ]);
     }
 }

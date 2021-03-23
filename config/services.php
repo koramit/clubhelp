@@ -35,6 +35,7 @@ return [
         'client_secret' => env('LINE_CLIENT_SECRET'),
         'redirect'      => env('LINE_CLIENT_REDIRECT'),
         'bot_link_url'  => env('LINE_BOT_LINK_URL'),
+        'base_endpoint'  => env('LINE_BASE_ENDPOINT'),
         'bot_token'     => env('LINE_BOT_TOKEN'),
     ],
 
@@ -43,9 +44,13 @@ return [
         'client_secret' => env('TELEGRAM_CLIENT_SECRET'),
         'redirect'      => env('TELEGRAM_CLIENT_REDIRECT'),
         'bot_link_url'  => env('TELEGRAM_BOT_LINK_URL'),
+        'base_endpoint'  => env('TELEGRAM_BASE_ENDPOINT').env('TELEGRAM_CLIENT_SECRET').'/',
         'bot_token'     => env('TELEGRAM_CLIENT_SECRET'),
         'widget_src'     => env('TELEGRAM_WIDGET_SRC'),
         'request_access'     => env('TELEGRAM_REQUEST_ACCESS', null),
     ],
+
+    'data_api_token' => env('DATA_API_TOKEN', null),
+    'data_api_secret' => env('DATA_API_SECRET', null),
 
 ];

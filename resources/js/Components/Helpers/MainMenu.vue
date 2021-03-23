@@ -1,10 +1,10 @@
 <template>
-    <div>
+    <div v-if="$page.props.flash.mainMenuLinks.length">
         <div class="mb-4">
             <inertia-link
                 class="flex items-center group py-2 outline-none"
                 :href="`${$page.props.app.baseUrl}/${link.route}`"
-                v-for="(link, key) in $page.props.user.mainMenuLinks"
+                v-for="(link, key) in $page.props.flash.mainMenuLinks"
                 :key="key"
             >
                 <icon

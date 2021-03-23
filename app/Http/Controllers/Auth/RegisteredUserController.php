@@ -53,7 +53,6 @@ class RegisteredUserController extends Controller
 
         $socialProfile = Session::get('socialProfile');
         $user = new User();
-        $user->slug = Str::uuid()->toString();
         $user->name = $data['name'];
         $user->email = $data['email'];
         $user->password = Hash::make(Str::random());
@@ -68,6 +67,7 @@ class RegisteredUserController extends Controller
             'tel_no' => $data['tel_no'],
             'org_id' => $data['org_id'],
             'remark' => $data['remark'],
+            'divisions' => [],
             'notification_channels' => [],
             'social' => $socialProfile,
         ];

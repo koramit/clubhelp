@@ -30,13 +30,15 @@
         </label>
     </div>
     <div v-else>
-        <label class="inline-flex items-center cursor-pointer">
-            <input
-                type="checkbox"
-                class="shadow-xs h-6 w-6 transition-all duration-200 ease-in-out appearance-none color inline-block align-middle border border-gray-400 select-none flex-shrink-0 rounded cursor-pointer focus:outline-none"
-                :checked="modelValue"
-                @change="change"
-            >
+        <label class="inline-flex items-center cursor-pointer ">
+            <span class="text-bitter-theme-light">
+                <input
+                    type="checkbox"
+                    class="shadow-xs h-6 w-6 transition-all duration-200 ease-in-out appearance-none color inline-block align-middle border border-dark-theme-light select-none flex-shrink-0 rounded cursor-pointer focus:outline-none"
+                    :checked="modelValue"
+                    @change="change"
+                >
+            </span>
             <span class="ml-4 text-sm md:text-base xl:text-lg">{{ label }}</span>
         </label>
     </div>

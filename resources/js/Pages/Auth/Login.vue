@@ -11,9 +11,10 @@
             </div>
         </div>
         <div class="mt-4 px-4 py-8 w-80 bg-white rounded shadow transform -translate-y-16">
+            <span class="block font-fascinate-inline text-xl text-thick-theme-light mt-8 text-center">Drop-in consult note</span>
             <a
                 :href="`${$page.props.app.baseUrl}/login/line`"
-                class="flex justify-center items-center mt-12 cursor-pointer w-full rounded-sm shadow-sm bg-line text-center text-gray-100 p-2"
+                class="flex justify-center items-center mt-8 cursor-pointer w-full rounded-sm shadow-sm bg-line text-center text-gray-100 p-2"
             >
                 <icon
                     name="line-app"
@@ -36,6 +37,9 @@ export default {
     props: {
         configs: { type: Object, default: () => {} }
     },
+    created () {
+        document.title = 'Login';
+    },
     mounted() {
         this.$nextTick(function () {
             const pageLoadingIndicator = document.getElementById('page-loading-indicator');
@@ -56,8 +60,6 @@ export default {
             this.$refs.telegram.appendChild(script);
         });
     }
-
-
 };
 </script>
 
