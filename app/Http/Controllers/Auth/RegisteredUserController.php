@@ -67,7 +67,7 @@ class RegisteredUserController extends Controller
             'tel_no' => $data['tel_no'],
             'org_id' => $data['org_id'],
             'remark' => $data['remark'],
-            'divisions' => [],
+            'divisions' => ['medicine'],
             'notification_channels' => [],
             'social' => $socialProfile,
         ];
