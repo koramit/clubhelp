@@ -34,9 +34,6 @@
             <!-- <span class="text-sm">{{ `${encounter.type}@${encounter.encountered_at}` }}</span> -->
             <!-- <span class="text-sm px-2 rounded border border-alt-theme-light text-alt-theme-light">{{ encounter.subscription.as.toUpperCase() }}</span> -->
         </div>
-        <button @click="$refs.createStayCaseModal.open()">
-            create
-        </button>
     </div>
 </template>
 <script>
