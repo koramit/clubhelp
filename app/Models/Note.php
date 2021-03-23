@@ -12,6 +12,8 @@ class Note extends Model
 
     protected $guarded = [];
 
+    protected $casts = ['tags' => 'array'];
+
     public function encounter()
     {
         return $this->belongsTo(Encounter::class);

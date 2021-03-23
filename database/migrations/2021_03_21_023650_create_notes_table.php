@@ -18,6 +18,7 @@ class CreateNotesTable extends Migration
             $table->uuid('slug');
             $table->string('type', 30)->default('note');
             $table->text('content');
+            $table->json('tags')->nullable();
             $table->foreignId('encounter_id')->constrained();
             $table->foreignId('user_id')->constrained();
             $table->softDeletes();

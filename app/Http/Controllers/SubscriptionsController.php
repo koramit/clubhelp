@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Managers\SubscriptionManager;
+use App\Models\Encounter;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
@@ -26,7 +26,9 @@ class SubscriptionsController extends Controller
             ['icon' => 'procedure', 'label' => 'Add IPD case (later... 😅)', 'action' => 'not-ready'],
         ]);
 
-        $encounters = (Auth::user()->load([
+        $user = Auth::user();
+
+        $encounters = ($user->load([
             'encounters' => fn ($q) => $q->select(['id', 'patient_id', 'slug', 'meta', 'encountered_at'])
                                          ->with('patient'), // ->wherePivotIn('status', ['unlisted'])
             ])
@@ -35,7 +37,32 @@ class SubscriptionsController extends Controller
             'id' => $e->id,
             'slug' => $e->slug,
             'type' => ucwords($e->meta['type']),
-            'encountered_at' => $e->encountered_at->tz(Auth::user()->timezone)->format('d M Y'),
+            'encountered_at' => $e->encountered_at->tz($user->timezone)->format('d M Y'),
+            'patient' => [
+                'hn' => $e->patient->hn,
+                'fullname' => $e->patient->fullname,
+                'first_name' => $e->patient->profile['first_name'],
+                'gender' => $e->patient->profile['gender'],
+            ],
+            'subscription' => [
+                'status' => $e->subscription->status,
+                'as' => $e->subscription->as,
+            ],
+        ]);
+
+        // check if user has service requests
+        $requests = Encounter::with('patient')
+                             ->whereHas('notes', function ($query) use ($user) {
+                                 $query->whereType('consult')
+                                       ->whereJsonContains('tags', $user->profile['divisions'][0]);
+                             })->whereNotIn('id', $encounters->pluck('id')->toArray())
+                             ->get();
+
+        $requests = $requests->transform(fn ($e) => [
+            'id' => $e->id,
+            'slug' => $e->slug,
+            'type' => ucwords($e->meta['type']),
+            'encountered_at' => $e->encountered_at->tz($user->timezone)->format('d M Y'),
             'patient' => [
                 'hn' => $e->patient->hn,
                 'fullname' => $e->patient->fullname,
@@ -43,60 +70,32 @@ class SubscriptionsController extends Controller
                 'gender' => $e->patient->profile['gender'],
             ],
         ]);
-        // $encounters = (Auth::user()->load('encounters'))->encounters;
 
-        return Inertia::render('Encounters/User/Index', ['encounters' => $encounters]);
+        return Inertia::render('Encounters/User/Index', ['encounters' => $encounters, 'requests' => $requests]);
     }
 
     public function store()
     {
-        // by defauly this method accept encouner id
-        // but if patient_id and type are presented that means
-        // we should create 'Stay' or 'OPD' encounter by redirecting to the route
-        if (Request::has('encounter_id')) { // and check if its invalid
-            // not implement yet
-            abort(500);
-        }
-
-        if (! Request::has('patient_id') || ! (Request::has('type'))) {
+        if (! Request::has('id') || ! Request::has('as')) { // and check if id is invalid
             Log::info('user '.Auth::user()->id.' send incomplete request');
             abort(400);
         }
 
-        // patient has no encounters so, make one
-        return Redirect::action(
-            [EncountersController::class, 'store'],
-            ['patient_id' => Request::input('patient_id'), 'type' => Request::input('type')]
-        );
+        Auth::user()->encounters()->syncWithoutDetaching([
+            Request::input('id') => ['status' => 'enlisted', 'as' => Request::input('as')],
+        ]);
 
-        /*
-         * Validtion Refactor later 😂
-        */
-        // if (! Request::has('patient_id') || ! Request::has('type')) {
+        return Redirect::route('cases');
+
+        // if (! Request::has('patient_id') || ! (Request::has('type'))) {
         //     Log::info('user '.Auth::user()->id.' send incomplete request');
         //     abort(400);
         // }
-        // $patient = Patient::find(Request::input('patient_id'));
-        // if (! $patient) {
-        //     Log::info(Auth::user()->id.' send invalid patient id');
-        //     abort(400);
-        // }
-        // // if (Request::input('type') == 'stay' && ! Request::has('dateVisit')) {
-        // //     Log::info(Auth::user()->id.' send incomplete request OPD no dateVisit');
-        // //     abort(400);
-        // // }
 
-        // // $subscription = (new SubscriptionManager())->manage(Request::input('patient_id'), Request::input('type'), Request::input('dateVisit', null));
-        // $subscription = (new SubscriptionManager())->manage($patient, Request::input('type'), Request::input('dateVisit', null));
-
-        // if (! $subscription) {
-        //     if (Request::input('type') === 'stay') {
-        //         return Redirect::route('patient.cases', ['slug' => Patient::find(Request::input('patient_id'))->slug, 'type' => 'stay']);
-        //     }
-        //     Log::info('user '.Auth::user()->id.' add case with not exists patient ID '.Request::input('patient_id'));
-        //     abort(404);
-        // }
-
-        // return Redirect::back();
+        // // patient has no encounters so, make one
+        // return Redirect::action(
+        //     [EncountersController::class, 'store'],
+        //     ['patient_id' => Request::input('patient_id'), 'type' => Request::input('type')]
+        // );
     }
 }

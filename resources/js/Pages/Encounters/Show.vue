@@ -9,16 +9,72 @@
             </inertia-link>
             <span class=" text-bitter-theme-light">/ {{ capitalize(encounter.meta.type) }}@{{ encounter.encountered_at }}</span>
         </h1>
+
+        <hr class="my-4 border-b-2 border-bitter-theme-light">
+
+        <div>
+            <div class="flex">
+                <form-input
+                    class=" w-8/12"
+                    placeholder="todo..."
+                    v-model="task"
+                />
+                <button
+                    class="block font-fascinate-inline bg-alt-theme-light text-white ml-1 rounded w-4/12"
+                    @click="addTask"
+                >
+                    ADD
+                </button>
+            </div>
+            <div
+                class="mt-2 flex"
+                v-for="(todo, key) in todos"
+                :key="key"
+            >
+                <form-checkbox
+                    class="w-10/12"
+                    v-model="todo.check"
+                    :label="todo.label"
+                />
+                <button
+                    class="w-2/12"
+                    @click="todos.splice(key, 1)"
+                >
+                    <icon
+                        name="times-circle"
+                        class="w-5 h-5"
+                    />
+                </button>
+            </div>
+
+            <hr class="my-4 border-b-2 border-bitter-theme-light">
+        </div>
+
         <div
             v-for="note in encounter.notes"
             :key="note.slug"
             class="p-2 trix-text bg-white rounded shadow mt-2"
-            :class="{'ml-2 rounded-br-2xl': note.user_id == $page.props.user.id}"
+            :class="{
+                'ml-4 rounded-br-2xl': note.user_id == $page.props.user.id,
+                'mr-4 rounded-bl-2xl': note.user_id != $page.props.user.id,
+                'border-b-4 border-bitter-theme-light': note.type === 'consult'
+            }"
         >
             <div v-html="note.content" />
-            <p class=" text-xs text-gray-400 italic text-right px-2">
-                {{ note.created_at }}
-            </p>
+            <div
+                class="mt-1"
+                :class="{'flex justify-between': note.user_id != $page.props.user.id}"
+            >
+                <p
+                    class=" text-xs text-gray-400 italic text-left px-2"
+                    v-if="note.user_id != $page.props.user.id"
+                >
+                    {{ note.author }}
+                </p>
+                <p class=" text-xs text-gray-400 italic text-right px-2">
+                    {{ note.created_at }}
+                </p>
+            </div>
         </div>
         <text-editor
             class="mt-8"
@@ -33,7 +89,10 @@
         >
             <button
                 class="m-1 p-2 bg-alt-theme-light text-white font-semibold shadow-sm rounded-2xl transition-colors duration-300 ease-in-out"
-                :class="{ 'bg-thick-theme-light': tags.indexOf(division) > -1 }"
+                :class="{
+                    'bg-thick-theme-light': tags.indexOf(division) > -1,
+                    'bg-bitter-theme-light': division.toLowerCase() === 'urgent'
+                }"
                 v-for="division in divisions"
                 :key="division"
                 @click="toggleTag(division)"
@@ -45,34 +104,43 @@
             <button
                 class="btn btn-bitter w-full"
                 @click="toggleConsult"
+                :disabled="busy"
             >
                 CONSULT
             </button>
-            <button
+            <spinner-button
+                :spin="busy"
                 class="btn btn-dark w-full"
                 @click="addNote"
                 :disabled="!content"
             >
                 ADD NOTE
-            </button>
+            </spinner-button>
         </div>
     </div>
 </template>
 <script>
 import Layout from '@/Components/Layouts/Layout';
-import TextEditor from '@/Components/Controls/TextEditor.vue';
+import TextEditor from '@/Components/Controls/TextEditor';
+import Icon from '@/Components/Helpers/Icon';
+import FormInput from '@/Components/Controls/FormInput';
+import FormCheckbox from '@/Components/Controls/FormCheckbox';
+import SpinnerButton from '@/Components/Controls/SpinnerButton';
 export default {
-    components: { TextEditor },
+    components: { TextEditor, FormInput, SpinnerButton, FormCheckbox, Icon },
     layout: Layout,
     props: {
         encounter: { type: Object, required: true }
     },
     data () {
         return {
+            busy: false,
             content: '',
             showDivisions: false,
-            divisions: ['Allergy','Ambulatory','Cardiology','Chest','Critical Care','Endocrinology','Gastroenterology','Genetics','Geriatric','Hematology','Hypertension','Infectious','Nephrology','Neurology','Nutrition','Oncology','Rheumatology'],
-            tags: []
+            divisions: ['Urgent','Allergy','Ambulatory','Cardiology','Chest','Critical Care','Endocrinology','Gastroenterology','Genetics','Geriatric','Hematology','Hypertension','Infectious','Nephrology','Neurology','Nutrition','Oncology','Rheumatology'],
+            tags: [],
+            todos: [],
+            task: '',
         };
     },
     methods: {
@@ -81,14 +149,18 @@ export default {
             this.eventBus.emit('typing-stopped');
         },
         addNote () {
+            this.busy = true;
             this.$inertia.post(
                 `${this.$page.props.app.baseUrl}/cases/${this.encounter.id}/notes`,
-                { content: this.content, consult: this.tags },
+                { content: this.content, type: this.tags.length > 0 ? 'consult':'note', tags: this.tags.length > 0 ? this.tags : null },
                 {
                     onSuccess: () => {
                         this.$refs.textEditor.clear();
                         this.tags = [];
                         this.showDivisions = false;
+                    },
+                    onFinish: () => {
+                        this.busy = false;
                     },
                 }
             );
@@ -112,7 +184,14 @@ export default {
         capitalize (word) {
             if (typeof word !== 'string') return '';
             return word.charAt(0).toUpperCase() + word.slice(1);
-        }
+        },
+        addTask () {
+            this.todos.push({label: this.task, check: false});
+            this.task = '';
+        },
+        // removeTask (label) {
+        //     const point =  this.todos.splice(key);
+        // }
     }
 };
 </script>

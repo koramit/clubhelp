@@ -46,7 +46,7 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Encounter::class)
                     ->as('subscription')
-                    ->withPivot('status')
+                    ->withPivot('status', 'as', 'draft')
                     ->withTimestamps();
     }
 
@@ -128,6 +128,17 @@ class User extends Authenticatable
         return $this->getNotificationRecipient('telegram');
     }
 
+    /**
+     * Route notifications for the Log channel.
+     *
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return string
+     */
+    public function routeNotificationForLog($notification)
+    {
+        return $this->getNotificationRecipient('log');
+    }
+
     public function getNotificationRecipient($provider)
     {
         $channel = $this->getNotificationChannel();
@@ -147,5 +158,14 @@ class User extends Authenticatable
     public function getPrefersNotificationChannelAttribute()
     {
         return isset($this->profile['notification_channels']['provider']) ? $this->profile['notification_channels']['provider'] : null;
+    }
+
+    public function assignDivision($division)
+    {
+        $profile = $this->profile;
+        $profile['divisions'] = [$division];
+        $this->profile = $profile;
+
+        return $this->save();
     }
 }

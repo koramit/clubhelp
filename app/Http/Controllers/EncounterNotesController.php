@@ -25,11 +25,13 @@ class EncounterNotesController extends Controller
 
         Request::session()->flash('page-title', $encounter->page_title_short);
 
-        $encounter->load(['notes' => fn ($q) => $q->select(['encounter_id', 'content', 'slug', 'user_id', 'created_at'])]);
+        $encounter->load(['notes' => fn ($q) => $q->select(['encounter_id', 'content', 'slug', 'user_id', 'type', 'created_at'])]);
         $encounter->notes->transform(fn ($n) => [
             'content' => $n->content,
             'user_id' => $n->user_id,
+            'author' => $n->author->name,
             'slug' => $n->slug,
+            'type' => $n->type,
             'created_at' => $n->created_at->longRelativeToNowDiffForHumans(),
         ]);
 

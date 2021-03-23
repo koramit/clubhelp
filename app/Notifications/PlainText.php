@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Channels\LineChannel;
+use App\Channels\LogChannel;
 use App\Channels\TelegramChannel;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
@@ -34,13 +35,15 @@ class PlainText extends Notification
     {
         // notification will send to all channels in return array
         if (! $notifiable instanceof User) {
-            return [LineChannel::class, TelegramChannel::class];
+            return [LineChannel::class, TelegramChannel::class, LogChannel::class];
         }
 
         if ($notifiable->prefers_notification_channel === 'line') {
             return [LineChannel::class];
         } elseif ($notifiable->prefers_notification_channel === 'telegram') {
             return [TelegramChannel::class];
+        } elseif ($notifiable->prefers_notification_channel === 'log') {
+            return [LogChannel::class];
         } else {
             return [];
         }
@@ -67,6 +70,16 @@ class PlainText extends Notification
             'chat_id' => ($notifiable instanceof User) ?
                             $notifiable->getNotificationRecipient('telegram') :
                             null,
+            'text' => $this->message,
+        ];
+    }
+
+    public function toLog($notifiable)
+    {
+        return [
+            'user' => ($notifiable instanceof User) ?
+                        $notifiable->getNotificationRecipient('log') :
+                        null,
             'text' => $this->message,
         ];
     }

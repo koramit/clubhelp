@@ -30,7 +30,7 @@ class CreateEncountersTableMigration extends Migration
             $table->foreignId('encounter_id')->constrained();
             $table->foreignId('user_id')->constrained();
             $table->string('status', 30)->index(); // enlisted|unlisted
-            $table->string('as', 30)->index(); // personal|service
+            $table->string('as', 30)->index(); // md|consultant
             $table->text('draft')->nullable();
             $table->timestamps();
         });
