@@ -54,9 +54,6 @@
                 </div>
             </div>
         </div>
-        <button @click="$refs.searchPatientModal.open()">
-            add stay
-        </button>
     </div>
 </template>
 
