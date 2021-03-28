@@ -40,6 +40,10 @@ class CreateUsersTable extends Migration
             $table->timestamps();
         });
 
+        foreach (['ไกลจัง', 'coconut', 'กินจิ', 'apple', 'กุ๊กไก่', 'banana'] as $name) {
+            App\Models\Role::create(['name' => $name]);
+        }
+
         Schema::create('ability_role', function (Blueprint $table) {
             $table->primary(['role_id', 'ability_id']);
             $table->unsignedSmallInteger('role_id')->constrained('roles')->onDelete('cascade');
