@@ -10,4 +10,9 @@ class Role extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    public static function testThai()
+    {
+        return static::where('name', 'like', '%ก%')->get();
+    }
 }
