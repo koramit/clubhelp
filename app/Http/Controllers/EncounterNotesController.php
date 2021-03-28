@@ -35,13 +35,17 @@ class EncounterNotesController extends Controller
             'created_at' => $n->created_at->longRelativeToNowDiffForHumans(),
         ]);
 
+        $user = Auth::user();
+
         $encounter = [
             'id' => $encounter->id,
             'meta' => $encounter->meta,
-            'encountered_at' => $encounter->encountered_at->tz(Auth::user()->timezone)->format('d M Y'),
+            'encountered_at' => $encounter->encountered_at->tz($user->timezone)->format('d M Y'),
             'notes' => $encounter->notes,
         ];
 
-        return Inertia::render('Encounters/Show', ['encounter' => $encounter]);
+        $subscription = \DB::table('encounter_user')->where('encounter_id', $encounter['id'])->where('user_id', $user->id)->first();
+
+        return Inertia::render('Encounters/Show', ['encounter' => $encounter, 'subscription' => $subscription]);
     }
 }

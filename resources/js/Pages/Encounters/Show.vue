@@ -130,7 +130,8 @@ export default {
     components: { TextEditor, FormInput, SpinnerButton, FormCheckbox, Icon },
     layout: Layout,
     props: {
-        encounter: { type: Object, required: true }
+        encounter: { type: Object, required: true },
+        subscription: { type: Object, required: true },
     },
     data () {
         return {
@@ -150,9 +151,17 @@ export default {
         },
         addNote () {
             this.busy = true;
+            const data = { content: this.content };
+            if (this.tags.length) {
+                data.type = 'consult';
+                data.tags = this.tags;
+            } else {
+                data.type = this.subscription.as === 'consultant' ? 'service' : 'note';
+                data.tags = null;
+            }
             this.$inertia.post(
-                `${this.$page.props.app.baseUrl}/cases/${this.encounter.id}/notes`,
-                { content: this.content, type: this.tags.length > 0 ? 'consult':'note', tags: this.tags.length > 0 ? this.tags : null },
+                `${this.$page.props.app.baseUrl}/cases/${this.encounter.id}/notes`, data,
+                // { content: this.content, type: this.tags.length > 0 ? 'consult':'note', tags: this.tags.length > 0 ? this.tags : null },
                 {
                     onSuccess: () => {
                         this.$refs.textEditor.clear();
