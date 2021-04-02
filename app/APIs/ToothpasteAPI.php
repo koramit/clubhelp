@@ -80,6 +80,11 @@ class ToothpasteAPI implements PatientAPI, AuthenticationAPI
         return $data;
     }
 
+    public function venti($id)
+    {
+        return $this->brushing($this->pasteLoad('venti', ['id' => $id]));
+    }
+
     protected function brushing($data)
     {
         $response = Http::timeout(5)
@@ -94,7 +99,7 @@ class ToothpasteAPI implements PatientAPI, AuthenticationAPI
         return [
             'ok' => false,
             'found' => false,
-            'message' => $response->json()['message'],
+            'message' => $response->json()['message'] ?? 'not available',
         ];
     }
 
