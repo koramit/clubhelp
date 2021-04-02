@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col justify-center items-center w-full min-h-screen p-4">
         <div class="mt-4 px-4 py-8 w-80 bg-white rounded shadow">
-            <div class="font-semibold text-xl text-center">
+            <div class="font-semibold font-fascinate-inline text-thick-theme-light text-xl text-center">
                 You are Quarantined.
             </div>
             <div v-if="mode === 'notification'">

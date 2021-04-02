@@ -74,6 +74,12 @@ return [
             'app' => env('HANNAH_APP'),
             'token' => env('HANNAH_TOKEN'),
         ],
+        'venti' => [
+            'endpoint' => env('HANNAH_URL').'venti-checkup',
+            'auth' => 'token_secret',
+            'app' => env('HANNAH_APP'),
+            'token' => env('HANNAH_TOKEN'),
+        ],
     ],
 
 ];
