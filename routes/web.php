@@ -60,12 +60,3 @@ Route::middleware('qualify')->get('/patients/{patient:slug}/cases', [PatientEnco
 Route::middleware('qualify')->post('/patients/{patient:slug}/cases', [PatientEncountersController::class, 'store'])->name('patient.cases');
 Route::middleware('qualify')->post('/cases/{encounter}/notes', [NotesController::class, 'store']);
 Route::middleware('qualify')->post('/cases', [SubscriptionsController::class, 'store']);
-
-
-// temp checkup
-Route::post('/checkup', function () {
-    return [
-        'ok' => true,
-        'timestamp' => now()->format('Y-m-d H:i')
-    ];
-});
