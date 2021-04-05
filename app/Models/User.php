@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 class User extends Authenticatable
 {
@@ -42,6 +43,16 @@ class User extends Authenticatable
         'next_activation_at' => 'datetime',
     ];
 
+    /**
+     * A user may be assigned many roles.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class)->withTimestamps();
+    }
+
     public function encounters()
     {
         return $this->belongsToMany(Encounter::class)
@@ -55,10 +66,24 @@ class User extends Authenticatable
         return 'asia/bangkok';
     }
 
+    public function getRoleNamesAttribute()
+    {
+        return Session::get('role_names', function () {
+            $roleNames = $this->roles->pluck('name');
+            Session::put('role_names', $roleNames);
+
+            return $roleNames;
+        });
+    }
+
     public function needQuarantine()
     {
         if (! $this->getNotificationChannel()) {
             return 'notification';
+        }
+
+        if ($this->role_names->count() === 0) {
+            return 'no_role';
         }
 
         if ($this->next_activation_at->isPast()) {
