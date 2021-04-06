@@ -4,13 +4,14 @@ use App\Http\Controllers\Auth\ActivatedUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\EncounterNotesController;
-use App\Http\Controllers\EncounterProvidersController;
 use App\Http\Controllers\NotesController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\PatientDataAPIController;
 use App\Http\Controllers\PatientEncountersController;
 use App\Http\Controllers\QuarantinedUserController;
+use App\Http\Controllers\Services\AdmissionEncountersController;
 use App\Http\Controllers\Services\LINEWebhooksController;
+use App\Http\Controllers\Services\StayEncountersController;
 use App\Http\Controllers\Services\TelegramWebhooksController;
 use App\Http\Controllers\SubscriptionsController;
 use App\Http\Controllers\SupportsController;
@@ -51,11 +52,11 @@ Route::middleware('auth')->post('/quarantine', [QuarantinedUserController::class
 // webhooks
 Route::post('/webhooks/line', LINEWebhooksController::class);
 Route::post('/webhooks/telegram/{token}', TelegramWebhooksController::class);
+Route::post('/webhooks/stay', StayEncountersController::class);
+Route::post('/webhooks/admission', AdmissionEncountersController::class);
 
 // frontend apis
 Route::middleware('qualify')->post('/search-patient/{hn}', PatientDataAPIController::class);
-// data providers apis
-Route::post('/encounter-providers/stay', [EncounterProvidersController::class, 'stay']);
 
 // Features
 Route::middleware('qualify')->get('/preferences', UserPreferencesController::class);
