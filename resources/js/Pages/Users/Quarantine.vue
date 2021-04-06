@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col justify-center items-center w-full min-h-screen p-4">
+    <div class="flex flex-col justify-center items-center w-full p-4">
         <div class="mt-4 px-4 py-8 w-80 bg-white rounded shadow">
             <div class="font-semibold font-fascinate-inline text-thick-theme-light text-xl text-center">
                 You are Quarantined.
@@ -51,6 +51,12 @@
                     </div>
                 </div>
             </div>
+            <div v-else-if="mode === 'no_role'">
+                <div class="font-semibold mt-4 text-dark-theme-light">
+                    <span class="block italic text-center">Your membership is pending.</span>
+                    <span class="block text-center mt-4">Our club managers will get in touch with you shortly.</span>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -58,10 +64,12 @@
 <script>
 import Icon from '@/Components/Helpers/Icon.vue';
 import axios from 'axios';
+import Layout from '@/Components/Layouts/Layout';
 import FormInput from '@/Components/Controls/FormInput';
 import SpinnerButton from '@/Components/Controls/SpinnerButton';
 export default {
     components: { Icon, FormInput, SpinnerButton },
+    layout: Layout,
     props: {
         mode: { type: String, required: true },
         socialProvider: { type: String, required: true },
@@ -87,21 +95,6 @@ export default {
             },
             busy: false,
         };
-    },
-    created () {
-        document.title = 'Quarantine';
-    },
-    mounted() {
-        this.$nextTick(() => {
-            const pageLoadingIndicator = document.getElementById('page-loading-indicator');
-            if (pageLoadingIndicator) {
-                pageLoadingIndicator.remove();
-            }
-            if (this.mode === 'notification') {
-                setTimeout(this.checkNotificationChannel, 10000);
-            }
-        });
-
     },
     methods: {
         checkNotificationChannel () {
