@@ -54,12 +54,20 @@
                         </template>
                         <template #dropdown>
                             <div class="mt-2 py-2 shadow-xl bg-thick-theme-light text-white cursor-pointer rounded text-sm">
-                                <inertia-link
-                                    class="block px-6 py-2 hover:bg-dark-theme-light hover:text-soft-theme-light"
-                                    :href="`${$page.props.app.baseUrl}/preferences`"
-                                >
-                                    Preferences
-                                </inertia-link>
+                                <tamplate v-if="hasRoles">
+                                    <inertia-link
+                                        class="block px-6 py-2 hover:bg-dark-theme-light hover:text-soft-theme-light"
+                                        :href="`${$page.props.app.baseUrl}/supports`"
+                                    >
+                                        Consult IT
+                                    </inertia-link>
+                                    <inertia-link
+                                        class="block px-6 py-2 hover:bg-dark-theme-light hover:text-soft-theme-light"
+                                        :href="`${$page.props.app.baseUrl}/preferences`"
+                                    >
+                                        Preferences
+                                    </inertia-link>
+                                </tamplate>
                                 <inertia-link
                                     class="w-full font-semibold text-left px-6 py-2 hover:bg-dark-theme-light hover:text-soft-theme-light"
                                     :href="`${$page.props.app.baseUrl}/logout`"
@@ -78,7 +86,7 @@
                     class="h-4/5 mx-1 md:hidden block fixed top-0 inset-x-0 overflow-y-scroll text-soft-theme-light bg-dark-theme-light rounded-bl-xl rounded-br-xl transition-transform transform duration-300 ease-in-out"
                     :class="{ '-translate-y-full': !mobileMenuVisible }"
                 >
-                    <div class="p-4 relative">
+                    <div class="p-4 relative min-h-full">
                         <!-- username and menu -->
                         <div
                             class="flex flex-col text-center"
@@ -97,12 +105,20 @@
                                 </div>
                             </div>
                             <span class="inline-block py-1 text-white">{{ $page.props.user.name }}</span>
-                            <inertia-link
-                                class="block py-1"
-                                :href="`${$page.props.app.baseUrl}/preferences`"
-                            >
-                                Preferences
-                            </inertia-link>
+                            <template v-if="hasRoles">
+                                <inertia-link
+                                    class="block py-1"
+                                    :href="`${$page.props.app.baseUrl}/supports`"
+                                >
+                                    Consult IT
+                                </inertia-link>
+                                <inertia-link
+                                    class="block py-1"
+                                    :href="`${$page.props.app.baseUrl}/preferences`"
+                                >
+                                    Preferences
+                                </inertia-link>
+                            </template>
                             <inertia-link
                                 class="block py-1"
                                 :href="`${$page.props.app.baseUrl}/logout`"
@@ -167,6 +183,11 @@ import ActionMenu from '@/Components/Helpers/ActionMenu';
 import axios from 'axios';
 export default {
     components: { Dropdown, Icon, MainMenu, ActionMenu },
+    computed: {
+        hasRoles() {
+            return this.$page.props.user.abilities.length;
+        }
+    },
     watch: {
         '$page.props.flash': {
             immediate: true,
