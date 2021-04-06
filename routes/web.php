@@ -13,6 +13,8 @@ use App\Http\Controllers\QuarantinedUserController;
 use App\Http\Controllers\Services\LINEWebhooksController;
 use App\Http\Controllers\Services\TelegramWebhooksController;
 use App\Http\Controllers\SubscriptionsController;
+use App\Http\Controllers\SupportsController;
+use App\Http\Controllers\UserPreferencesController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -56,6 +58,8 @@ Route::middleware('qualify')->post('/search-patient/{hn}', PatientDataAPIControl
 Route::post('/encounter-providers/stay', [EncounterProvidersController::class, 'stay']);
 
 // Features
+Route::middleware('qualify')->get('/preferences', UserPreferencesController::class);
+Route::middleware('qualify')->get('/supports', [SupportsController::class, 'index']);
 Route::middleware('qualify')->get('/cases', fn () => 'cases');
 
 // SubscriptionsController, EncounterNotesController, PatientEncountersController, NotesController
