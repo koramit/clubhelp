@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\InvalidMembership;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -91,6 +92,8 @@ class User extends Authenticatable
         }
 
         if ($this->role_names->count() === 0) {
+            InvalidMembership::dispatch($this);
+
             return 'no_role';
         }
 
