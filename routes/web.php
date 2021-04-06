@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\ActivatedUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\EncounterNotesController;
+use App\Http\Controllers\EncounterProvidersController;
 use App\Http\Controllers\NotesController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\PatientDataAPIController;
@@ -44,7 +45,6 @@ Route::middleware('guest')->post('/activate', ActivatedUserController::class);
 // quarantine user
 Route::middleware('auth')->get('/quarantine', [QuarantinedUserController::class, 'index'])->name('quarantine');
 Route::middleware('auth')->post('/quarantine', [QuarantinedUserController::class, 'store']);
-Route::middleware('auth')->get('/quarantine/{mode}', [QuarantinedUserController::class, 'show']);
 
 // webhooks
 Route::post('/webhooks/line', LINEWebhooksController::class);
@@ -52,11 +52,16 @@ Route::post('/webhooks/telegram/{token}', TelegramWebhooksController::class);
 
 // frontend apis
 Route::middleware('qualify')->post('/search-patient/{hn}', PatientDataAPIController::class);
+// data providers apis
+Route::post('/encounter-providers/stay', [EncounterProvidersController::class, 'stay']);
 
 // Features
-Route::middleware('qualify')->get('/cases', [SubscriptionsController::class, 'index'])->name('cases');
-Route::middleware('qualify')->get('/cases/{encounter:slug}/notes', [EncounterNotesController::class, 'index'])->name('case.notes');
-Route::middleware('qualify')->get('/patients/{patient:slug}/cases', [PatientEncountersController::class, 'index'])->name('patient.cases');
-Route::middleware('qualify')->post('/patients/{patient:slug}/cases', [PatientEncountersController::class, 'store'])->name('patient.cases');
-Route::middleware('qualify')->post('/cases/{encounter}/notes', [NotesController::class, 'store']);
-Route::middleware('qualify')->post('/cases', [SubscriptionsController::class, 'store']);
+Route::middleware('qualify')->get('/cases', fn () => 'cases');
+
+// SubscriptionsController, EncounterNotesController, PatientEncountersController, NotesController
+    // Route::middleware('qualify')->get('/cases', [SubscriptionsController::class, 'index'])->name('cases');
+// Route::middleware('qualify')->get('/cases/{encounter:slug}/notes', [EncounterNotesController::class, 'index'])->name('case.notes');
+// Route::middleware('qualify')->get('/patients/{patient:slug}/cases', [PatientEncountersController::class, 'index'])->name('patient.cases');
+// Route::middleware('qualify')->post('/patients/{patient:slug}/cases', [PatientEncountersController::class, 'store'])->name('patient.cases');
+// Route::middleware('qualify')->post('/cases/{encounter}/notes', [NotesController::class, 'store']);
+// Route::middleware('qualify')->post('/cases', [SubscriptionsController::class, 'store']);

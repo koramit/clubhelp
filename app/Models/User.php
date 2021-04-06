@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Session;
 
 class User extends Authenticatable
 {
@@ -61,6 +61,15 @@ class User extends Authenticatable
                     ->withTimestamps();
     }
 
+    public function getAbilitiesAttribute()
+    {
+        return Cache::remember("uid-{$this->id}-abilities", config('session.lifetime') * 60, function () {
+            unset($this->roles);
+
+            return $this->roles->map->abilities->flatten()->pluck('name')->unique();
+        });
+    }
+
     public function getTimezoneAttribute()
     {
         return 'asia/bangkok';
@@ -68,11 +77,10 @@ class User extends Authenticatable
 
     public function getRoleNamesAttribute()
     {
-        return Session::get('role_names', function () {
-            $roleNames = $this->roles->pluck('name');
-            Session::put('role_names', $roleNames);
+        return Cache::remember("uid-{$this->id}-role-names", config('session.lifetime') * 60, function () {
+            unset($this->roles);
 
-            return $roleNames;
+            return $this->roles->pluck('name');
         });
     }
 
@@ -91,6 +99,38 @@ class User extends Authenticatable
         }
 
         return false;
+    }
+
+    /**
+     * Assign a new role to the user.
+     *
+     * @param  mixed  $role
+     */
+    public function assignRole($role)
+    {
+        if (is_string($role)) {
+            $role = Role::whereName($role)->firstOrCreate(['name' => $role]);
+        }
+        $this->roles()->syncWithoutDetaching($role);
+        unset($this->roles);
+        Cache::put("uid-{$this->id}-role-names", $this->roles->pluck('name'), config('session.lifetime') * 60);
+        Cache::put("uid-{$this->id}-abilities", $this->roles->map->abilities->flatten()->pluck('name')->unique(), config('session.lifetime') * 60);
+    }
+
+    /**
+     * revoke a role from the user.
+     *
+     * @param  mixed  $role
+     */
+    public function revokeRole($role)
+    {
+        if (is_string($role)) {
+            $role = Role::whereName($role)->firstOrCreate(['name' => $role]);
+        }
+        $this->roles()->detach($role);
+        unset($this->roles);
+        Cache::put("uid-{$this->id}-role-names", $this->roles->pluck('name'), config('session.lifetime') * 60);
+        Cache::put("uid-{$this->id}-abilities", $this->roles->map->abilities->flatten()->pluck('name')->unique(), config('session.lifetime') * 60);
     }
 
     public function getNotificationChannel()
