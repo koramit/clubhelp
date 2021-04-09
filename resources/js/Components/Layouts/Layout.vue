@@ -54,20 +54,22 @@
                         </template>
                         <template #dropdown>
                             <div class="mt-2 py-2 shadow-xl bg-thick-theme-light text-white cursor-pointer rounded text-sm">
-                                <tamplate v-if="hasRoles">
+                                <template v-if="hasRoles">
                                     <inertia-link
                                         class="block px-6 py-2 hover:bg-dark-theme-light hover:text-soft-theme-light"
                                         :href="`${$page.props.app.baseUrl}/supports`"
+                                        v-if="! currentPage('supports')"
                                     >
                                         Consult IT
                                     </inertia-link>
                                     <inertia-link
                                         class="block px-6 py-2 hover:bg-dark-theme-light hover:text-soft-theme-light"
                                         :href="`${$page.props.app.baseUrl}/preferences`"
+                                        v-if="! currentPage('preferences')"
                                     >
                                         Preferences
                                     </inertia-link>
-                                </tamplate>
+                                </template>
                                 <inertia-link
                                     class="w-full font-semibold text-left px-6 py-2 hover:bg-dark-theme-light hover:text-soft-theme-light"
                                     :href="`${$page.props.app.baseUrl}/logout`"
@@ -109,12 +111,14 @@
                                 <inertia-link
                                     class="block py-1"
                                     :href="`${$page.props.app.baseUrl}/supports`"
+                                    v-if="! currentPage('supports')"
                                 >
                                     Consult IT
                                 </inertia-link>
                                 <inertia-link
                                     class="block py-1"
                                     :href="`${$page.props.app.baseUrl}/preferences`"
+                                    v-if="! currentPage('preferences')"
                                 >
                                     Preferences
                                 </inertia-link>
@@ -229,6 +233,7 @@ export default {
                 pageLoadingIndicator.remove();
             }
         });
+        console.log(this.currentPage('preferences'));
     },
     // setup () {
     //     var lastTimeCheckSessionTimeout = Date.now();
@@ -260,6 +265,9 @@ export default {
             setTimeout(() => {
                 this.eventBus.emit('action-clicked', action);
             }, 300); // equal to animate duration
+        },
+        currentPage(route) {
+            return location.pathname.substr(1) === route;
         }
     }
 };
