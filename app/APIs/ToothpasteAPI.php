@@ -11,6 +11,11 @@ class ToothpasteAPI implements PatientAPI, AuthenticationAPI
 {
     public function authenticate($login, $password)
     {
+        $password = str_replace('+', 'BuAgSiGn', $password);
+        $password = str_replace('%', 'PeRcEnTsIgN', $password);
+        $password = str_replace('&', 'LaEsIgN', $password);
+        $password = str_replace('=', 'TaOkUbSiGn', $password);
+
         $data = $this->brushing($this->pasteLoad('authenticate', ['login' => $login, 'password' => $password]));
         if (! $data['found']) {
             $data['message'] = __('auth.failed');
