@@ -6,7 +6,6 @@ use App\APIs\LINEAuthUserAPI;
 use App\APIs\TelegramAuthUserAPI;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Providers\RouteServiceProvider;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -70,7 +69,7 @@ class AuthenticatedSessionController extends Controller
                 return Redirect::route('quarantine');
             }
 
-            return Redirect::intended(RouteServiceProvider::HOME);
+            return Redirect::intended($userExist->home_page);
         }
 
         // register user
