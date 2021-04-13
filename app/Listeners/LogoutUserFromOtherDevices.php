@@ -8,23 +8,13 @@ use Illuminate\Support\Facades\Auth;
 class LogoutUserFromOtherDevices
 {
     /**
-     * Create the event listener.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        //
-    }
-
-    /**
-     * Handle the event.
+     * Logout user from other devices.
      *
      * @param  Login  $event
      * @return void
      */
     public function handle(Login $event)
     {
-        Auth::logoutOtherDevices($event->user->profile['social']['id']);
+        Auth::logoutOtherDevices($event->user->profile['logout_other_devices_token']);
     }
 }

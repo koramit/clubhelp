@@ -233,7 +233,6 @@ export default {
                 pageLoadingIndicator.remove();
             }
         });
-        console.log(this.currentPage('preferences'));
     },
     // setup () {
     //     var lastTimeCheckSessionTimeout = Date.now();

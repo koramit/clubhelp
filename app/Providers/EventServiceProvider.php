@@ -6,8 +6,10 @@ namespace App\Providers;
 // use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use App\Events\ConsultationNoteCreated;
 use App\Events\InvalidMembership;
+use App\Listeners\LogoutUserFromOtherDevices;
 use App\Listeners\OpenInvalidMembershipTicket;
 use App\Listeners\SendConsultationNoteNotification;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 // use Illuminate\Support\Facades\Event;
@@ -23,6 +25,9 @@ class EventServiceProvider extends ServiceProvider
         // Registered::class => [
         //     SendEmailVerificationNotification::class,
         // ],
+        Login::class => [
+            LogoutUserFromOtherDevices::class,
+        ],
         InvalidMembership::class => [
             OpenInvalidMembershipTicket::class,
         ],

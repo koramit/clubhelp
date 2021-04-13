@@ -43,9 +43,9 @@ class AuthenticatedSessionController extends Controller
     {
         try {
             if ($provider === 'line') {
-                $user = new LINEAuthUserAPI();
+                $socialUser = new LINEAuthUserAPI();
             } elseif ($provider === 'telegram') {
-                $user = new TelegramAuthUserAPI();
+                $socialUser = new TelegramAuthUserAPI();
             } else {
                 return abort(404);
             }
@@ -55,32 +55,26 @@ class AuthenticatedSessionController extends Controller
             return Redirect::route('login'); // SHOULD return WITH NOTICE USER about ERROR
         }
 
-        $userExist = User::where('profile->social->provider', $provider)
-                         ->where('profile->social->id', $user->getId())
-                         ->first();
-
-        if ($userExist) {
-            // UPDATE USER SOCIAL PROFILE NOT YET IMPLEMENT
-
-            Auth::login($userExist);
-
-            // check if user need quarantine
-            if ($userExist->needQuarantine()) {
-                return Redirect::route('quarantine');
-            }
-
-            return Redirect::intended($userExist->home_page);
-        }
-
-        // register user
+        // for register user
         Session::put('socialProfile', [
             'provider' => $provider,
-            'id' => $user->getId(),
-            'name' => $user->getName(),
-            'email' => $user->getEmail(),
-            'avatar' => $user->getAvatar(),
-            'nickname' => $user->getNickname(),
+            'id' => $socialUser->getId(),
+            'name' => $socialUser->getName(),
+            'email' => $socialUser->getEmail(),
+            'avatar' => $socialUser->getAvatar(),
+            'nickname' => $socialUser->getNickname(),
         ]);
+
+        $user = User::where('profile->social->provider', $provider)
+                    ->where('profile->social->id', $socialUser->getId())
+                    ->first();
+
+        if ($user) {
+            // UPDATE USER SOCIAL PROFILE NOT YET IMPLEMENT
+            Auth::login($user);
+
+            return Redirect::intended($user->home_page);
+        }
 
         return Redirect::route('register');
     }

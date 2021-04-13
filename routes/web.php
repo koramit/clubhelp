@@ -24,10 +24,9 @@ Route::get('/login-as/{id}', function ($id) {
     if (config('app.env') === 'production') {
         abort(403);
     }
+    $user = Auth::loginUsingId($id);
 
-    Auth::loginUsingId($id);
-
-    return redirect()->route('cases');
+    return redirect()->route($user->home_page);
 });
 
 // Pages
@@ -47,6 +46,7 @@ Route::middleware('guest')->post('/activate', ActivatedUserController::class);
 
 // quarantine user
 Route::middleware('auth')->get('/quarantine', [QuarantinedUserController::class, 'index'])->name('quarantine');
+Route::middleware('auth')->get('/quarantine/notification', [QuarantinedUserController::class, 'show']);
 Route::middleware('auth')->post('/quarantine', [QuarantinedUserController::class, 'store']);
 
 // webhooks
@@ -59,8 +59,11 @@ Route::post('/webhooks/admission', AdmissionEncountersController::class);
 Route::middleware('qualify')->post('/search-patient/{hn}', PatientDataAPIController::class);
 
 // Features
-Route::middleware('qualify')->get('/preferences', UserPreferencesController::class);
+Route::middleware('qualify')->get('/preferences', UserPreferencesController::class)->name('preferences');
 Route::middleware('qualify')->get('/supports', [SupportsController::class, 'index']);
+// locations - ward selection
+// lounge - division consult cases
+//
 Route::middleware('qualify')->get('/cases', fn () => 'cases');
 
 // SubscriptionsController, EncounterNotesController, PatientEncountersController, NotesController

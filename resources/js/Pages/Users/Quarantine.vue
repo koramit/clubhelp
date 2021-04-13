@@ -96,12 +96,16 @@ export default {
             busy: false,
         };
     },
+    mounted () {
+        if (this.mode === 'notification') {
+            this.checkNotificationChannel();
+        }
+    },
     methods: {
         checkNotificationChannel () {
             axios.get(`${this.$page.props.app.baseUrl}/quarantine/notification`)
                 .then(response => {
                     if (response.data) {
-                        console.log(response.data);
                         this.$inertia.get(`${this.$page.props.app.baseUrl}/${this.redirectTo}`);
                     } else {
                         if (this.pollingCount < 100) {
@@ -125,7 +129,7 @@ export default {
                         this.credential.password = '';
                     }
                     this.busy = false;
-                }).catch(error => {
+                }).catch(() => {
                     this.errors.activate = 'Service unavailable at the moment, please try again.';
                     this.busy = false;
                 });
