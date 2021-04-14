@@ -68,15 +68,13 @@ class AuthenticatedSessionController extends Controller
         $user = User::where('profile->social->provider', $provider)
                     ->where('profile->social->id', $socialUser->getId())
                     ->first();
-
-        if ($user) {
-            // UPDATE USER SOCIAL PROFILE NOT YET IMPLEMENT
-            Auth::login($user);
-
-            return Redirect::intended($user->home_page);
+        if (! $user) {
+            return Redirect::route('register');
         }
 
-        return Redirect::route('register');
+        Auth::login($user);
+
+        return Redirect::intended($user->home_page);
     }
 
     /**

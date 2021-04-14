@@ -2,17 +2,16 @@
 
 namespace App\Providers;
 
-// use Illuminate\Auth\Events\Registered;
-// use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use App\Events\ConsultationNoteCreated;
 use App\Events\InvalidMembership;
+use App\Events\Registered;
+use App\Listeners\AssignRoleToUser;
 use App\Listeners\LogoutUserFromOtherDevices;
 use App\Listeners\OpenInvalidMembershipTicket;
 use App\Listeners\SendConsultationNoteNotification;
+use App\Listeners\UpdateUserSocialProfile;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-
-// use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -22,14 +21,15 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        // Registered::class => [
-        //     SendEmailVerificationNotification::class,
-        // ],
-        Login::class => [
-            LogoutUserFromOtherDevices::class,
+        Registered::class => [
+            AssignRoleToUser::class,
         ],
         InvalidMembership::class => [
             OpenInvalidMembershipTicket::class,
+        ],
+        Login::class => [
+            LogoutUserFromOtherDevices::class,
+            UpdateUserSocialProfile::class,
         ],
         ConsultationNoteCreated::class => [
             SendConsultationNoteNotification::class,

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Events\Registered;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -78,12 +78,8 @@ class RegisteredUserController extends Controller
         ];
         $user->next_activation_at = now()->addDays($data['password_expires_in_days'] ?? 0);
         $user->save();
-
         Auth::login($user);
-
-        event(new Registered($user));
-
-        Session::forget('socialProfile');
+        Registered::dispatch($user);
 
         return Redirect::route('quarantine');
     }
