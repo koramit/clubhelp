@@ -90,9 +90,18 @@
 
             <form-input
                 class="mt-2"
-                label="BP (mmHg)"
-                name="bp"
-                v-model="vital_signs.bp"
+                label="SBP (mmHg)"
+                name="sbp"
+                type="tel"
+                v-model="vital_signs.sbp"
+            />
+
+            <form-input
+                class="mt-2"
+                label="DBP (mmHg)"
+                name="dbp"
+                type="tel"
+                v-model="vital_signs.dbp"
             />
 
             <form-input
@@ -275,7 +284,8 @@ export default {
                 temperature_celsius: '',
                 pulse_per_minute: '',
                 respiration_rate_per_minute: '',
-                bp: '',
+                sbp: '',
+                dbp: '',
                 o2_sat: '',
             },
             symptoms: {
