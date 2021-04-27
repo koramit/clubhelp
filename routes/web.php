@@ -29,6 +29,10 @@ Route::get('/login-as/{id}', function ($id) {
     return redirect()->route($user->home_page);
 });
 
+Route::get('/prototype/{page}', function ($page) {
+    return Inertia\Inertia::render('Prototype/'.$page);
+});
+
 // Pages
 Route::get('/', [PagesController::class, 'welcome']);
 Route::get('/policies', [PagesController::class, 'policies'])->name('policies');
