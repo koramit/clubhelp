@@ -6,7 +6,6 @@ use App\APIs\LINEAuthUserAPI;
 use App\APIs\TelegramAuthUserAPI;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Providers\RouteServiceProvider;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -44,9 +43,9 @@ class AuthenticatedSessionController extends Controller
     {
         try {
             if ($provider === 'line') {
-                $user = new LINEAuthUserAPI();
+                $socialUser = new LINEAuthUserAPI();
             } elseif ($provider === 'telegram') {
-                $user = new TelegramAuthUserAPI();
+                $socialUser = new TelegramAuthUserAPI();
             } else {
                 return abort(404);
             }
@@ -56,34 +55,26 @@ class AuthenticatedSessionController extends Controller
             return Redirect::route('login'); // SHOULD return WITH NOTICE USER about ERROR
         }
 
-        $userExist = User::where('profile->social->provider', $provider)
-                         ->where('profile->social->id', $user->getId())
-                         ->first();
-
-        if ($userExist) {
-            // UPDATE USER SOCIAL PROFILE NOT YET IMPLEMENT
-
-            Auth::login($userExist);
-
-            // check if user need quarantine
-            if ($userExist->needQuarantine()) {
-                return Redirect::route('quarantine');
-            }
-
-            return Redirect::intended(RouteServiceProvider::HOME);
-        }
-
-        // register user
+        // for register user
         Session::put('socialProfile', [
             'provider' => $provider,
-            'id' => $user->getId(),
-            'name' => $user->getName(),
-            'email' => $user->getEmail(),
-            'avatar' => $user->getAvatar(),
-            'nickname' => $user->getNickname(),
+            'id' => $socialUser->getId(),
+            'name' => $socialUser->getName(),
+            'email' => $socialUser->getEmail(),
+            'avatar' => $socialUser->getAvatar(),
+            'nickname' => $socialUser->getNickname(),
         ]);
 
-        return Redirect::route('register');
+        $user = User::where('profile->social->provider', $provider)
+                    ->where('profile->social->id', $socialUser->getId())
+                    ->first();
+        if (! $user) {
+            return Redirect::route('register');
+        }
+
+        Auth::login($user);
+
+        return Redirect::intended($user->home_page);
     }
 
     /**

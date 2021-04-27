@@ -51,6 +51,7 @@ class HandleInertiaRequests extends Middleware
                     'id' => $request->user()->id,
                     'name' => $request->user()->name,
                     'avatar' => $request->user()->profile['social']['avatar'],
+                    'abilities' => $request->user()->abilities->toArray(),
                 ] : null,
         ]);
     }

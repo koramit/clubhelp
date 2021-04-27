@@ -9,9 +9,13 @@ use App\Http\Controllers\PagesController;
 use App\Http\Controllers\PatientDataAPIController;
 use App\Http\Controllers\PatientEncountersController;
 use App\Http\Controllers\QuarantinedUserController;
+use App\Http\Controllers\Services\AdmissionEncountersController;
 use App\Http\Controllers\Services\LINEWebhooksController;
+use App\Http\Controllers\Services\StayEncountersController;
 use App\Http\Controllers\Services\TelegramWebhooksController;
 use App\Http\Controllers\SubscriptionsController;
+use App\Http\Controllers\SupportsController;
+use App\Http\Controllers\UserPreferencesController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -20,10 +24,13 @@ Route::get('/login-as/{id}', function ($id) {
     if (config('app.env') === 'production') {
         abort(403);
     }
+    $user = Auth::loginUsingId($id);
 
-    Auth::loginUsingId($id);
+    return redirect()->route($user->home_page);
+});
 
-    return redirect()->route('cases');
+Route::get('/prototype/{page}', function ($page) {
+    return Inertia\Inertia::render('Prototype/'.$page);
 });
 
 // Pages
@@ -43,29 +50,30 @@ Route::middleware('guest')->post('/activate', ActivatedUserController::class);
 
 // quarantine user
 Route::middleware('auth')->get('/quarantine', [QuarantinedUserController::class, 'index'])->name('quarantine');
+Route::middleware('auth')->get('/quarantine/notification', [QuarantinedUserController::class, 'show']);
 Route::middleware('auth')->post('/quarantine', [QuarantinedUserController::class, 'store']);
-Route::middleware('auth')->get('/quarantine/{mode}', [QuarantinedUserController::class, 'show']);
 
 // webhooks
 Route::post('/webhooks/line', LINEWebhooksController::class);
 Route::post('/webhooks/telegram/{token}', TelegramWebhooksController::class);
+Route::post('/webhooks/stay', StayEncountersController::class);
+Route::post('/webhooks/admission', AdmissionEncountersController::class);
 
 // frontend apis
 Route::middleware('qualify')->post('/search-patient/{hn}', PatientDataAPIController::class);
 
 // Features
-Route::middleware('qualify')->get('/cases', [SubscriptionsController::class, 'index'])->name('cases');
-Route::middleware('qualify')->get('/cases/{encounter:slug}/notes', [EncounterNotesController::class, 'index'])->name('case.notes');
-Route::middleware('qualify')->get('/patients/{patient:slug}/cases', [PatientEncountersController::class, 'index'])->name('patient.cases');
-Route::middleware('qualify')->post('/patients/{patient:slug}/cases', [PatientEncountersController::class, 'store'])->name('patient.cases');
-Route::middleware('qualify')->post('/cases/{encounter}/notes', [NotesController::class, 'store']);
-Route::middleware('qualify')->post('/cases', [SubscriptionsController::class, 'store']);
+Route::middleware('qualify')->get('/preferences', UserPreferencesController::class)->name('preferences');
+Route::middleware('qualify')->get('/supports', [SupportsController::class, 'index']);
+// locations - ward selection
+// lounge - division consult cases
+//
+Route::middleware('qualify')->get('/cases', fn () => 'cases');
 
-
-// temp checkup
-Route::post('/checkup', function () {
-    return [
-        'ok' => true,
-        'timestamp' => now()->format('Y-m-d H:i')
-    ];
-});
+// SubscriptionsController, EncounterNotesController, PatientEncountersController, NotesController
+    // Route::middleware('qualify')->get('/cases', [SubscriptionsController::class, 'index'])->name('cases');
+// Route::middleware('qualify')->get('/cases/{encounter:slug}/notes', [EncounterNotesController::class, 'index'])->name('case.notes');
+// Route::middleware('qualify')->get('/patients/{patient:slug}/cases', [PatientEncountersController::class, 'index'])->name('patient.cases');
+// Route::middleware('qualify')->post('/patients/{patient:slug}/cases', [PatientEncountersController::class, 'store'])->name('patient.cases');
+// Route::middleware('qualify')->post('/cases/{encounter}/notes', [NotesController::class, 'store']);
+// Route::middleware('qualify')->post('/cases', [SubscriptionsController::class, 'store']);

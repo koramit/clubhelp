@@ -11,6 +11,11 @@ class SmuggleAPI implements PatientAPI, AuthenticationAPI
 {
     public function authenticate($login, $password)
     {
+        $password = str_replace('+', 'BuAgSiGn', $password);
+        $password = str_replace('%', 'PeRcEnTsIgN', $password);
+        $password = str_replace('&', 'LaEsIgN', $password);
+        $password = str_replace('=', 'TaOkUbSiGn', $password);
+
         $data = [
             'function' => 'authenticate',
             'org_id'   => $login,

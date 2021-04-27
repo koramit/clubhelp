@@ -54,12 +54,22 @@
                         </template>
                         <template #dropdown>
                             <div class="mt-2 py-2 shadow-xl bg-thick-theme-light text-white cursor-pointer rounded text-sm">
-                                <inertia-link
-                                    class="block px-6 py-2 hover:bg-dark-theme-light hover:text-soft-theme-light"
-                                    :href="`${$page.props.app.baseUrl}/preferences`"
-                                >
-                                    Preferences
-                                </inertia-link>
+                                <template v-if="hasRoles">
+                                    <inertia-link
+                                        class="block px-6 py-2 hover:bg-dark-theme-light hover:text-soft-theme-light"
+                                        :href="`${$page.props.app.baseUrl}/supports`"
+                                        v-if="! currentPage('supports')"
+                                    >
+                                        Consult IT
+                                    </inertia-link>
+                                    <inertia-link
+                                        class="block px-6 py-2 hover:bg-dark-theme-light hover:text-soft-theme-light"
+                                        :href="`${$page.props.app.baseUrl}/preferences`"
+                                        v-if="! currentPage('preferences')"
+                                    >
+                                        Preferences
+                                    </inertia-link>
+                                </template>
                                 <inertia-link
                                     class="w-full font-semibold text-left px-6 py-2 hover:bg-dark-theme-light hover:text-soft-theme-light"
                                     :href="`${$page.props.app.baseUrl}/logout`"
@@ -78,10 +88,62 @@
                     class="h-4/5 mx-1 md:hidden block fixed top-0 inset-x-0 overflow-y-scroll text-soft-theme-light bg-dark-theme-light rounded-bl-xl rounded-br-xl transition-transform transform duration-300 ease-in-out"
                     :class="{ '-translate-y-full': !mobileMenuVisible }"
                 >
-                    <div class="p-4">
+                    <div class="p-4 relative min-h-full">
+                        <!-- username and menu -->
+                        <div
+                            class="flex flex-col text-center"
+                            @click="mobileMenuVisible = false"
+                        >
+                            <div class="flex justify-center mt-2">
+                                <div
+                                    class="w-12 h-12 rounded-full overflow-hidden border-bitter-theme-light border-2"
+                                    v-if="!avatarSrcError"
+                                >
+                                    <img
+                                        :src="`${$page.props.user.avatar}`"
+                                        alt="C"
+                                        @error="avatarSrcError = true"
+                                    >
+                                </div>
+                            </div>
+                            <span class="inline-block py-1 text-white">{{ $page.props.user.name }}</span>
+                            <template v-if="hasRoles">
+                                <inertia-link
+                                    class="block py-1"
+                                    :href="`${$page.props.app.baseUrl}/supports`"
+                                    v-if="! currentPage('supports')"
+                                >
+                                    Consult IT
+                                </inertia-link>
+                                <inertia-link
+                                    class="block py-1"
+                                    :href="`${$page.props.app.baseUrl}/preferences`"
+                                    v-if="! currentPage('preferences')"
+                                >
+                                    Preferences
+                                </inertia-link>
+                            </template>
+                            <inertia-link
+                                class="block py-1"
+                                :href="`${$page.props.app.baseUrl}/logout`"
+                                method="post"
+                                as="button"
+                                type="button"
+                            >
+                                Logout
+                            </inertia-link>
+                        </div>
+                        <hr class="my-4">
+                        <main-menu
+                            @click="mobileMenuVisible = false"
+                            :url="url()"
+                        />
+                        <action-menu @action-clicked="actionClicked" />
+                    </div>
+                    <div class="sticky bottom-0 px-4 py-2 flex justify-items-center bg-dark-theme-light">
                         <!-- cookie-bite menu on mobile -->
                         <button
-                            class="block mx-auto md:hidden text-bitter-theme-light"
+                            class="block mx-auto text-bitter-theme-light"
                             @click="mobileMenuVisible = !mobileMenuVisible"
                         >
                             <svg
@@ -93,46 +155,6 @@
                                 d="M510.52 255.82c-69.97-.85-126.47-57.69-126.47-127.86-70.17 0-127-56.49-127.86-126.45-27.26-4.14-55.13.3-79.72 12.82l-69.13 35.22a132.221 132.221 0 0 0-57.79 57.81l-35.1 68.88a132.645 132.645 0 0 0-12.82 80.95l12.08 76.27a132.521 132.521 0 0 0 37.16 72.96l54.77 54.76a132.036 132.036 0 0 0 72.71 37.06l76.71 12.15c27.51 4.36 55.7-.11 80.53-12.76l69.13-35.21a132.273 132.273 0 0 0 57.79-57.81l35.1-68.88c12.56-24.64 17.01-52.58 12.91-79.91zM176 368c-17.67 0-32-14.33-32-32s14.33-32 32-32 32 14.33 32 32-14.33 32-32 32zm32-160c-17.67 0-32-14.33-32-32s14.33-32 32-32 32 14.33 32 32-14.33 32-32 32zm160 128c-17.67 0-32-14.33-32-32s14.33-32 32-32 32 14.33 32 32-14.33 32-32 32z"
                             /></svg>
                         </button>
-                        <!-- username and menu -->
-                        <div
-                            class="flex flex-col text-center"
-                            @click="mobileMenuVisible = false"
-                        >
-                            <span class="inline-block py-1 text-white">{{ $page.props.user.name }}</span>
-                            <inertia-link
-                                class="block py-1"
-                                :href="`${$page.props.app.baseUrl}/preferences`"
-                            >
-                                Preferences
-                            </inertia-link>
-                            <inertia-link
-                                class="block py-1"
-                                :href="`${$page.props.app.baseUrl}/logout`"
-                                method="post"
-                                as="button"
-                                type="button"
-                            >
-                                Logout
-                            </inertia-link>
-                            <div class="flex justify-center mt-2">
-                                <div
-                                    class="w-8 h-8 rounded-full overflow-hidden border-bitter-theme-light border-2"
-                                    v-if="!avatarSrcError"
-                                >
-                                    <img
-                                        :src="`${$page.props.user.avatar}`"
-                                        alt="C"
-                                        @error="avatarSrcError = true"
-                                    >
-                                </div>
-                            </div>
-                        </div>
-                        <hr class="my-4">
-                        <main-menu
-                            @click="mobileMenuVisible = false"
-                            :url="url()"
-                        />
-                        <action-menu @action-clicked="actionClicked" />
                     </div>
                 </div>
             </div>
@@ -165,6 +187,11 @@ import ActionMenu from '@/Components/Helpers/ActionMenu';
 import axios from 'axios';
 export default {
     components: { Dropdown, Icon, MainMenu, ActionMenu },
+    computed: {
+        hasRoles() {
+            return this.$page.props.user.abilities.length;
+        }
+    },
     watch: {
         '$page.props.flash': {
             immediate: true,
@@ -237,6 +264,9 @@ export default {
             setTimeout(() => {
                 this.eventBus.emit('action-clicked', action);
             }, 300); // equal to animate duration
+        },
+        currentPage(route) {
+            return location.pathname.substr(1) === route;
         }
     }
 };
